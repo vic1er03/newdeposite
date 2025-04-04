@@ -36,7 +36,7 @@ from sklearn.model_selection import train_test_split,GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import  f1_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -53,6 +53,26 @@ import warnings
 import io
 import json
 warnings.filterwarnings('ignore')
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+import scipy.stats as stats
+from statsmodels.stats.proportion import proportions_ztest
+from statsmodels.graphics.mosaicplot import mosaic
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import warnings
+warnings.filterwarnings('ignore')
+import calendar
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import plotly.express as px
+from scipy import stats
     
 
 
@@ -794,7 +814,30 @@ def set_background(image_file):
     """
     return st.markdown(bg_image, unsafe_allow_html=True)
 
-
+def Apercue(df_2019):
+            st.dataframe(df_2019.head())
+            
+            # Afficher les statistiques descriptives
+            st.subheader("Statistiques descriptives")
+            st.dataframe(df_2019.describe())
+            
+            # Visualiser les valeurs manquantes
+            st.subheader("Valeurs manquantes")
+            missing = df_2019.isnull().sum().sort_values(ascending=False)
+            missing = missing[missing > 0]
+            if len(missing) > 0:
+                missing_percent = (missing / len(df_2019) * 100).round(2)
+                missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
+                fig = px.bar(missing_df, x=missing_df.index, y='Pourcentage (%)', 
+                            text='Nombre',
+                            title='Valeurs manquantes - Données 2019',
+                            color='Pourcentage (%)',
+                            color_continuous_scale='Viridis')
+                fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("Aucune valeur manquante dans les données 2019.")
+        
 
 # Interface principale du tableau de bord
 def main():
@@ -814,7 +857,7 @@ def main():
     st.sidebar.title("Jeu de données")
     dataset = st.sidebar.radio(
         "Sélectionnez un jeu de données",
-        ["2019", "Volontaire"]
+        ["2019", "Volontaire","2020"]
     )
     
     # Sélectionner le DataFrame en fonction du choix
@@ -840,7 +883,33 @@ def main():
     
     if page == "Aperçu des données":
         st.header("Aperçu des Données")
+        # Configuration matplotlib
+        plt.style.use('seaborn-v0_8-whitegrid')
+        plt.rcParams['figure.figsize'] = (12, 8)
+        plt.rcParams['font.size'] = 12
+        plt.rcParams['axes.labelsize'] = 14
+        plt.rcParams['axes.titlesize'] = 16
+        plt.rcParams['xtick.labelsize'] = 12
+        plt.rcParams['ytick.labelsize'] = 12
+        plt.rcParams['legend.fontsize'] = 12
+        plt.rcParams['figure.titlesize'] = 20
+        # Chargement des données
+        df_2019, df_2020, df_volontaire = load_data()
+    
+        # Choix du dataset dans la sidebar
         
+    
+        # Affichage selon le choix
+        if dataset == "2019":
+            visualize_missing_values(df_2019, "Données 2019")
+            #analyze_distributions(df_2019, "Données 2019")
+        elif dataset== "2020":
+            visualize_missing_values(df_2020, "Données 2020")
+            analyze_distributions(df_2020, "Données 2020")
+        else:
+            visualize_missing_values(df_volontaire, "Données Volontaire")
+            analyze_distributions(df_volontaire, "Données Volontaire")
+
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Nombre de donneurs (2019)", len(df_2019))
@@ -850,129 +919,18 @@ def main():
             st.metric("Nombre de donneurs (Volontaires)", len(df_volontaire))
         
         st.subheader("Aperçu des données")
+
+        if dataset=="2019":
+            Apercue(df_2019)
+        elif dataset=="2020":
+            Apercue(df_2020)
+        else :
+            Apercue(df_volontaire)
+            
         
-        tab1, tab2, tab3 = st.tabs(["Données 2019", "Données 2020", "Données Volontaires"])
         
-        with tab1:
-            st.dataframe(df_2019.head())
             
-            # Afficher les statistiques descriptives
-            st.subheader("Statistiques descriptives")
-            st.dataframe(df_2019.describe())
-            
-            # Visualiser les valeurs manquantes
-            st.subheader("Valeurs manquantes")
-            missing = df_2019.isnull().sum().sort_values(ascending=False)
-            missing = missing[missing > 0]
-            if len(missing) > 0:
-                missing_percent = (missing / len(df_2019) * 100).round(2)
-                missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
-                fig = px.bar(missing_df, x=missing_df.index, y='Pourcentage (%)', 
-                            text='Nombre',
-                            title='Valeurs manquantes - Données 2019',
-                            color='Pourcentage (%)',
-                            color_continuous_scale='Viridis')
-                fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Aucune valeur manquante dans les données 2019.")
-        
-        with tab2:
-            st.dataframe(df_2020.head())
-            
-            # Afficher les statistiques descriptives
-            st.subheader("Statistiques descriptives")
-            st.dataframe(df_2020.describe())
-            
-            # Visualiser les valeurs manquantes
-            st.subheader("Valeurs manquantes")
-            missing = df_2020.isnull().sum().sort_values(ascending=False)
-            missing = missing[missing > 0]
-            if len(missing) > 0:
-                missing_percent = (missing / len(df_2020) * 100).round(2)
-                missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
-                fig = px.bar(missing_df, x=missing_df.index, y='Pourcentage (%)', 
-                            text='Nombre',
-                            title='Valeurs manquantes - Données 2020',
-                            color='Pourcentage (%)',
-                            color_continuous_scale='Viridis')
-                fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Aucune valeur manquante dans les données 2020.")
-        
-        with tab3:
-            st.dataframe(df_volontaire.head())
-            
-            # Afficher les statistiques descriptives
-            st.subheader("Statistiques descriptives")
-            st.dataframe(df_volontaire.describe())
-            
-            # Visualiser les valeurs manquantes
-            st.subheader("Valeurs manquantes")
-            missing = df_volontaire.isnull().sum().sort_values(ascending=False)
-            missing = missing[missing > 0]
-            if len(missing) > 0:
-                missing_percent = (missing / len(df_volontaire) * 100).round(2)
-                missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
-                fig = px.bar(missing_df.head(20), x=missing_df.head(20).index, y='Pourcentage (%)', 
-                            text='Nombre',
-                            title='Valeurs manquantes (Top 20) - Données Volontaires',
-                            color='Pourcentage (%)',
-                            color_continuous_scale='Viridis')
-                fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Aucune valeur manquante dans les données Volontaires.")
-    
-        
-            st.header("📋 Aperçu des données")
-            
-            # Afficher des statistiques générales
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Nombre total de donneurs", len(df))
-            with col2:
-                if 'Genre_' in df.columns:
-                    gender_counts = df['Genre_'].value_counts()
-                    st.metric("Hommes", gender_counts.get('Homme', 0))
-            with col3:
-                if 'Genre_' in df.columns:
-                    st.metric("Femmes", gender_counts.get('Femme', 0))
-            
-            # Afficher la distribution par âge si disponible
-            if 'Age' in df.columns:
-                st.subheader("Distribution par âge")
-                fig = px.histogram(
-                    df,
-                    x='Age',
-                    nbins=20,
-                    colors='Age',
-                    title="Distribution des âges des donneurs",
-                    labels={'Age': 'Âge', 'count': 'Nombre de donneurs'}
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            
-            # Afficher la distribution par niveau d'études si disponible
-            if 'Niveau_d\'etude' in df.columns:
-                st.subheader("Distribution par niveau d'études")
-                edu_counts = df['Niveau_d\'etude'].value_counts().reset_index()
-                edu_counts.columns = ['Niveau', 'Nombre']
-                
-                fig = px.bar(
-                    edu_counts,
-                    x='Niveau',
-                    y='Nombre',
-                    color='Niveau',
-                    title="Distribution par niveau d'études",
-                    labels={'Niveau': "Niveau d'études", 'Nombre': 'Nombre de donneurs'}
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            
-            # Afficher un aperçu du DataFrame
-            st.subheader("Aperçu des données brutes")
-            st.dataframe(paginate_dataframe(df))
-            
+           
             
     
     elif page == "Distribution géographique":
