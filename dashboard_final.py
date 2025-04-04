@@ -53,6 +53,8 @@ import warnings
 import io
 import json
 warnings.filterwarnings('ignore')
+    
+
 
 def paginate_dataframe(dataframe, page_size=10):
     """Ajoute une pagination à un DataFrame pour améliorer les performances."""
@@ -796,18 +798,6 @@ def set_background(image_file):
 
 # Interface principale du tableau de bord
 def main():
-    #image_file=r"C:\Users\hp\Desktop\Projet dashboard\WhatsApp Image 2025-03-23 à 22.21.36_abdc063e.jpg"
-    #set_background(image_file)
-    """
-    Fonction principale qui crée l'interface du tableau de bord Streamlit.
-    """
-    # Titre et introduction
-    st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
-    st.markdown("""
-    Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
-    permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
-    """)
-    
     # Charger les données
     df_2019, df_volontaire =load_data() #"df,df_volontaires"
     
@@ -815,7 +805,7 @@ def main():
     st.sidebar.title("Navigation")
     page = st.sidebar.radio(
         "Sélectionnez une page",
-        ["Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
+        ["Accueil","Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
          "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
          "Analyse de sentiment", "Prédiction d'éligibilité"]
     )
@@ -829,6 +819,21 @@ def main():
     
     # Sélectionner le DataFrame en fonction du choix
     df = df_2019 if dataset == "2019" else df_volontaire
+    
+    if page == "Accueil":
+        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
+        st.markdown("""
+        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
+        """)
+        image_file="image.jpg"
+        set_background(image_file)
+        """
+        Fonction principale qui crée l'interface du tableau de bord Streamlit.
+        """
+    # Titre et introduction
+    
+    
     
     # Afficher la page sélectionnée
     # Page d'accueil
