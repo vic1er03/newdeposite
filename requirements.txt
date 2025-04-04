@@ -1,5 +1,6 @@
 streamlit
 scipy
+statsmodels
 pandas
 numpy
 matplotlib
