@@ -73,6 +73,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
 from scipy import stats
+
+
+
     
 
 
@@ -874,6 +877,149 @@ def main():
         """
         Fonction principale qui crée l'interface du tableau de bord Streamlit.
         """
+
+    # Visualisation des valeurs manquantes
+def visualize_missing_values(df, title):
+    missing = df.isnull().sum().sort_values(ascending=False)
+    missing = missing[missing > 0]
+    missing_percent = (missing / len(df) * 100).round(2)
+    missing_df = pd.DataFrame({'Nombre de valeurs manquantes': missing, 'Pourcentage (%)': missing_percent})
+
+    if len(missing_df) > 0:
+        fig = px.bar(
+            missing_df,
+            x=missing_df.index,
+            y='Pourcentage (%)',
+            title=f'Valeurs manquantes - {title}',
+            text='Nombre de valeurs manquantes',
+            color='Pourcentage (%)',
+            color_continuous_scale='Viridis'
+        )
+        fig.update_layout(
+            xaxis_title='Variables',
+            yaxis_title='Pourcentage de valeurs manquantes (%)',
+            xaxis={'categoryorder': 'total descending'},
+            height=500
+        )
+        fig.update_traces(texttemplate='%{text}', textposition='outside')
+        #st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.success(f"Aucune valeur manquante dans le jeu de données : {title}")
+
+
+
+
+
+def analyze_distributions(df, sheet_name):
+    """
+    Analyse les distributions des variables avec visualisation intégrable à un dashboard Streamlit.
+    """
+    st.header(f"Analyse des distributions - {sheet_name}")
+
+    # Analyser les variables numériques
+    numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
+
+    if len(numeric_columns) > 0:
+        st.subheader("Variables numériques")
+        selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
+
+        for col in selected_numeric:
+            col1, col2 = st.columns(2)
+
+            # Histogramme avec KDE
+            fig1, ax1 = plt.subplots()
+            sns.histplot(df[col].dropna(), kde=True, ax=ax1, color='steelblue', alpha=0.7)
+            ax1.set_title(f'Distribution de {col}')
+            ax1.set_xlabel(col)
+            ax1.set_ylabel('Fréquence')
+
+            # Test de normalité
+            stat, p_value = stats.shapiro(df[col].dropna())
+            normality = "normale" if p_value > 0.05 else "non normale"
+            ax1.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
+                         xy=(0.05, 0.95), xycoords='axes fraction',
+                         bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8),
+                         ha='left', va='top')
+
+            with col1:
+                st.pyplot(fig1)
+
+            # Boxplot
+            fig2, ax2 = plt.subplots()
+            sns.boxplot(x=df[col].dropna(), ax=ax2, color='lightseagreen')
+            ax2.set_title(f'Boxplot de {col}')
+            ax2.set_xlabel(col)
+
+            # Statistiques descriptives
+            stats_desc = df[col].describe()
+            stats_text = (f"Moyenne: {stats_desc['mean']:.2f}\n"
+                          f"Médiane: {stats_desc['50%']:.2f}\n"
+                          f"Écart-type: {stats_desc['std']:.2f}\n"
+                          f"Min: {stats_desc['min']:.2f}\n"
+                          f"Max: {stats_desc['max']:.2f}")
+            ax2.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
+                         bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8),
+                         ha='left', va='top')
+
+            with col2:
+                st.pyplot(fig2)
+
+        # Graphique interactif Violin
+        if len(selected_numeric) > 1:
+            fig = go.Figure()
+            for col in selected_numeric:
+                fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
+            fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
+                              xaxis_title='Variables', yaxis_title='Valeurs', height=600,
+                              template='plotly_white')
+            st.plotly_chart(fig, use_container_width=True)
+
+    # Analyser les variables catégorielles
+    categorical_columns = df.select_dtypes(include=['object']).columns
+
+    if len(categorical_columns) > 0:
+        st.subheader("Variables catégorielles")
+        selected_categorical = list(categorical_columns)[:min(5, len(categorical_columns))]
+
+        for col in selected_categorical:
+            value_counts = df[col].value_counts()
+            value_counts_pct = df[col].value_counts(normalize=True) * 100
+
+            if len(value_counts) > 10:
+                top_n = value_counts.nlargest(9)
+                others = pd.Series({'Autres': value_counts.iloc[9:].sum()})
+                value_counts = pd.concat([top_n, others])
+
+                top_n_pct = value_counts_pct.nlargest(9)
+                others_pct = pd.Series({'Autres': value_counts_pct.iloc[9:].sum()})
+                value_counts_pct = pd.concat([top_n_pct, others_pct])
+
+            # Subplots Barres + Camembert
+            fig = make_subplots(rows=1, cols=2, specs=[[{"type": "bar"}, {"type": "pie"}]],
+                                subplot_titles=[f'Distribution de {col} (Barres)', f'Distribution de {col} (Camembert)'])
+
+            fig.add_trace(
+                go.Bar(x=value_counts.index, y=value_counts.values,
+                       text=[f"{x:.1f}%" for x in value_counts_pct.values.round(1)],
+                       textposition='outside', marker_color='lightseagreen'),
+                row=1, col=1
+            )
+
+            fig.add_trace(
+                go.Pie(labels=value_counts.index, values=value_counts.values,
+                       textinfo='label+percent', marker=dict(colors=px.colors.sequential.Viridis)),
+                row=1, col=2
+            )
+
+            fig.update_layout(title=f'Distribution de {col} - {sheet_name}', height=500, showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+
+            with st.expander(f"Détails sur {col}"):
+                for val, count in value_counts.items():
+                    st.write(f"- {val}: {count} ({value_counts_pct[val]:.1f}%)")
+
+
+
     # Titre et introduction
     
     
