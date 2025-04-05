@@ -780,7 +780,7 @@ def create_sentiment_analysis(df):
             polarite = blob.sentiment[0]
             return polarite
         except:
-            return pass 
+            return 'pass'
             
     comments_df['Score'] = comments_df[selected_col].apply(analyze_sentiments)
     # 🔢 Compter les sentiments
