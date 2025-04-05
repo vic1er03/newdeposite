@@ -767,13 +767,13 @@ def create_sentiment_analysis(df):
                 nltk.download('vader_lexicon', quiet=True)
                 nltk.download('all')
                 # Initialiser l'analyseur de sentiment
-                sia = SentimentIntensityAnalyzer()
+                sias = SentimentIntensityAnalyzer()
                 
                 # Fonction pour classifier le sentiment
                 def classify_sentiment(text):
-                    scores = sia.polarity_scores(text)
-                    sentiment = 1 if scores['pos']>0.05 else (-1 if scores['pos']<-0.05 else 0)
-                return sentiment 
+                    scores = sias.polarity_scores(text)
+                    sentiment = 1 if scores['compound']>0.05 else (-1 if scores['compound']<-0.05 else 0)
+                    return sentiment 
                 
                 # Appliquer l'analyse de sentiment
                 comments_df['Sentiment'] = comments_df[selected_col].apply(classify_sentiment)
