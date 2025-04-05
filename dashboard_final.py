@@ -756,7 +756,7 @@ def create_sentiment_analysis(df):
             lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]
 
             processed_text=' '.join(lemmatized_tokens)
-        return processed_text
+            return processed_text
         
         comments_df[selected_col]=comments_df[selected_col].apply(preprocess_text)
         
