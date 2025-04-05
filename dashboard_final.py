@@ -1014,8 +1014,6 @@ def main():
         ["2019", "Volontaire","2020"]
     )
     
-    # Sélectionner le DataFrame en fonction du choix
-    df = df_2019 if dataset == "2019" else df_volontaire
     
     if page == "Accueil":
         st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
@@ -1058,11 +1056,7 @@ def main():
         plt.rcParams['ytick.labelsize'] = 12
         plt.rcParams['legend.fontsize'] = 12
         plt.rcParams['figure.titlesize'] = 20
-        # Chargement des données
-        df_2019, df_2020, df_volontaire = load_data()
-    
-        # Choix du dataset dans la sidebar
-        
+       
     
         # Affichage selon le choix
         if dataset == "2019":
@@ -1094,6 +1088,9 @@ def main():
             
      # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
+    # Sélectionner le DataFrame en fonction du choix
+    df = df_2019 if dataset == "2019" else df_volontaire
+    
     
     if page == "Distribution géographique":
         st.header("🗺️ Distribution géographique des donneurs")
