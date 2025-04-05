@@ -1090,7 +1090,7 @@ def main():
             Apercue(df_volontaire)
             
      # Charger les données
-    df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
+    df_2019, df_2020, df_volontaire =load_data() 
     elif page == "Distribution géographique":
         st.header("🗺️ Distribution géographique des donneurs")
          # 1️⃣ Chargement des données (Fichier Excel)
