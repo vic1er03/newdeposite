@@ -1536,6 +1536,15 @@ def main():
             st.warning("Impossible d'analyser la fidélisation car les informations nécessaires ne sont pas disponibles dans les données.")
     
     elif page == "Analyse de sentiment":
+        st.header("🩺 Conditions de santé et éligibilité au don")   
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
+        
         st.header("💬 Analyse de sentiment des retours")
         nltk.download("vader_lexicon")
         sia = SentimentIntensityAnalyzer()
@@ -1549,6 +1558,10 @@ def main():
             text = " ".join(str(f) for f in df_volontaires["Si_autres_raison_préciser_"].dropna())
             wordcloud = WordCloud(width=800, height=400, background_color="white").generate(text)
             st.image(wordcloud.to_array(), caption="Nuage de Mots des Feedbacks", use_column_width=True)
+        if dataset == "2019":
+            create_sentiment_analysis(df_2019;"Donnée 2019")
+        if dataset == "Volontaire":
+            create_sentiment_analysis(df_volontaire;"Donnée volontaire")
         
         
         
