@@ -744,10 +744,13 @@ def create_sentiment_analysis(df):
         selected_col = comment_columns[0]
         
         # Filtrer les commentaires non vides
+        nltk.download('stopwords')
         comments_df = df[df[selected_col].notna() & (df[selected_col] != '')].copy()
         def preprocess_text(text):
             tokens=word_tokenize(text.lower())
-            filtered_tokens=[token for token in tokens if token not in stopwords.words('french')]
+            
+            filtered_tokens=[token for token in tokens if token not in set(stopwords.words('french'))]
+            
 
             lemmatizer=WordNetLemmatizer()
             lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]
