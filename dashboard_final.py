@@ -1056,7 +1056,7 @@ def main():
         # Affichage selon le choix
         if dataset == "2019":
             visualize_missing_values(df_2019, "Données 2019")
-            #analyze_distributions(df_2019, "Données 2019")
+            analyze_distributions(df_2019, "Données 2019")
         elif dataset== "2020":
             visualize_missing_values(df_2020, "Données 2020")
             analyze_distributions(df_2020, "Données 2020")
