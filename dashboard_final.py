@@ -1091,12 +1091,6 @@ def main():
             
      # Charger les données
     df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
-    
-        
-            
-           
-            
-    
     elif page == "Distribution géographique":
         st.header("🗺️ Distribution géographique des donneurs")
          # 1️⃣ Chargement des données (Fichier Excel)
