@@ -810,9 +810,9 @@ def create_sentiment_analysis(df):
                 plt.imshow(wordcloud, interpolation='bilinear')
                 plt.axis('off')
                 plt.tight_layout()
-                
+                wordcloud_path=2
                
-                
+                st.dataframe(comments_df)
                 return fig1, wordcloud_path, comments_df
             except Exception as e:
                 st.error(f"Erreur lors de l'analyse de sentiment: {e}")
