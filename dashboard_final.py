@@ -1349,7 +1349,7 @@ def main():
     # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
     
-    elif page == "Profils des donneurs":
+    if page == "Profils des donneurs":
         st.header("👥 Profils des donneurs")
         
         # Effectuer le clustering des donneurs
