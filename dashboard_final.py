@@ -778,7 +778,9 @@ def create_sentiment_analysis(df):
         try:
             blob = tb(str(text))
             polarite = blob.sentiment[0]
-        return polarite
+            return polarite
+        except:
+            return "Indéfini"
     comments_df['Score'] = comments_df[selected_col].apply(analyze_sentiments)
     # 🔢 Compter les sentiments
     sentiment_counts = comments_df['Sentiment'].value_counts().reset_index()
