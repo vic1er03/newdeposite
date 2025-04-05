@@ -734,99 +734,73 @@ def create_donor_retention_analysis(df):
 @st.cache_data
 def create_sentiment_analysis(df):
     """
-    Crée des visualisations pour l'analyse de sentiment des commentaires des donneurs.
+    Crée des visualisations pour l'analyse de sentiment des commentaires des donneurs (en français).
     """
-    # Vérifier si une colonne de commentaires est disponible
+    # Détecter les colonnes textuelles susceptibles d'être des commentaires
     comment_columns = [col for col in df.columns if any(term in col.lower() for term in 
                       ['préciser', 'raison', 'commentaire', 'feedback'])]
-    
-    if comment_columns:
-        selected_col = comment_columns[0]
-        
-        # Filtrer les commentaires non vides
-        nltk.download('stopwords')
-        comments_df = df[df[selected_col].notna() & (df[selected_col] != '')].copy()
-        def preprocess_text(text):
-            tokens=word_tokenize(text.lower())
-            
-            filtered_tokens=[token for token in tokens if token not in set(stopwords.words('french'))]
-            
 
-            lemmatizer=WordNetLemmatizer()
-            lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]
-
-            processed_text=' '.join(lemmatized_tokens)
-            return processed_text
-        
-        comments_df[selected_col]=comments_df[selected_col].apply(preprocess_text)
-        
-            
-        if len(comments_df) > 0:
-            # Télécharger les ressources NLTK si nécessaire
-            try:
-                nltk.download('vader_lexicon', quiet=True)
-                nltk.download('all')
-                # Initialiser l'analyseur de sentiment
-                sias = SentimentIntensityAnalyzer()
-                
-                # Fonction pour classifier le sentiment
-                def classify_sentiment(text):
-                    scores = sias.polarity_scores(text)
-                    sentiment = 1 if scores['compound']>0.05 else (-1 if scores['compound']<-0.05 else 0)
-                    return sentiment 
-                
-                # Appliquer l'analyse de sentiment
-                comments_df['Sentiment'] = comments_df[selected_col].apply(classify_sentiment)
-
-                def classify_sentiments(text):
-                    scores = sias.polarity_scores(text)
-                    return scores
-                comments_df['Score'] = comments_df[selected_col].apply(classify_sentiments)
-
-                
-                # Compter les sentiments
-                sentiment_counts = comments_df['Sentiment'].value_counts().reset_index()
-                sentiment_counts.columns = ['Sentiment', 'Nombre']
-                
-                # Créer un graphique circulaire
-                fig1 = px.pie(
-                    sentiment_counts,
-                    values='Nombre',
-                    names='Sentiment',
-                    title="Analyse de sentiment des commentaires",
-                    color_discrete_sequence=px.colors.qualitative.Set3
-                )
-                
-                fig1.update_layout(
-                    font=dict(size=12),
-                    height=400
-                )
-                st.plotly_chart(fig1)
-                # Créer un nuage de mots des commentaires les plus fréquents
-                from wordcloud import WordCloud
-                
-                # Combiner tous les commentaires
-                all_comments = ' '.join(comments_df[selected_col].astype(str).tolist())
-                
-                # Créer un nuage de mots
-                wordcloud = WordCloud(width=800, height=400, background_color='white', max_words=100).generate(all_comments)
-                
-                # Convertir le nuage de mots en image
-                plt.figure(figsize=(10, 5))
-                plt.imshow(wordcloud, interpolation='bilinear')
-                plt.axis('off')
-                plt.tight_layout()
-                wordcloud_path=2
-               
-                st.dataframe(comments_df)
-                return fig1, wordcloud_path, comments_df
-            except Exception as e:
-                st.error(f"Erreur lors de l'analyse de sentiment: {e}")
-                return None, None, None
-        else:
-            return None, None, None
-    else:
+    if not comment_columns:
+        st.warning("Aucune colonne de commentaires trouvée.")
         return None, None, None
+
+    selected_col = comment_columns[0]
+    comments_df = df[df[selected_col].notna() & (df[selected_col].astype(str).str.strip() != '')].copy()
+    
+    if comments_df.empty:
+        st.warning("Aucun commentaire exploitable pour l'analyse.")
+        return None, None, None
+
+    st.subheader("💬 Analyse de sentiment des commentaires (en français)")
+
+    # Initialisation de TextBlob-FR
+    tb = Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())
+
+    # Analyse de sentiment
+    def analyze_sentiment(text):
+        try:
+            blob = tb(str(text))
+            polarite = blob.sentiment[0]
+            # Catégorisation
+            if polarite > 0.1:
+                return "Positif"
+            elif polarite < -0.1:
+                return "Négatif"
+            else:
+                return "Neutre"
+        except:
+            return "Indéfini"
+
+    comments_df['Sentiment'] = comments_df[selected_col].apply(analyze_sentiment)
+
+    # 🔢 Compter les sentiments
+    sentiment_counts = comments_df['Sentiment'].value_counts().reset_index()
+    sentiment_counts.columns = ['Sentiment', 'Nombre']
+
+    # 📊 Graphique circulaire
+    fig1 = px.pie(sentiment_counts,
+                  values='Nombre',
+                  names='Sentiment',
+                  title="Répartition des sentiments",
+                  color_discrete_sequence=px.colors.qualitative.Set3)
+
+    st.plotly_chart(fig1)
+
+    # ☁️ Nuage de mots
+    all_comments = ' '.join(comments_df[selected_col].astype(str).tolist())
+    wordcloud = WordCloud(width=800, height=400, background_color='white', max_words=100).generate(all_comments)
+
+    st.subheader("☁️ Nuage de mots des commentaires")
+    fig2, ax = plt.subplots(figsize=(10, 5))
+    ax.imshow(wordcloud, interpolation='bilinear')
+    ax.axis('off')
+    st.pyplot(fig2)
+
+    # 📋 Afficher le tableau avec commentaires et sentiment
+    st.subheader("🧾 Détail des commentaires analysés")
+    st.dataframe(comments_df[[selected_col, 'Sentiment']])
+
+    return fig1, wordcloud, comments_df
 
 def set_background(image_file):
     with open(image_file, "rb") as f:
