@@ -134,7 +134,7 @@ def load_data():
     # Convertir les colonnes de dates au format datetime
     date_columns = [col for col in df_2019.columns if 'date' in col.lower()]
     for col in date_columns:
-        if col in df_2019tr.columns:
+        if col in df_2019.columns:
             try:
                 df_2019[col] = pd.to_datetime(df_2019[col], errors='coerce')
             except:
