@@ -73,6 +73,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
 from scipy import stats
+from statsmodels.graphics.mosaicplot import mosaic
 
 
 
@@ -312,61 +313,63 @@ def create_geo_map(df, location_column, color_column=None, zoom_start=10):
 
 # Fonction pour créer un graphique de santé et éligibilité
 @st.cache_data
-def create_health_eligibility_chart(df):
-    """
-    Crée un graphique interactif montrant l'impact des conditions de santé sur l'éligibilité au don.
-    """
-    # Identifier les colonnes de conditions de santé
-    health_columns = [col for col in df.columns if any(term in col for term in 
-                     ['Porteur', 'Opéré', 'Drepanocytaire', 'Diabétique', 'Hypertendus', 
-                      'Asthmatiques', 'Cardiaque', 'Tatoué', 'Scarifié'])]
+def analyze_categorical_relationships(df, sheet_name):
+    st.subheader(f"Analyse des relations entre variables catégorielles – {sheet_name}")
     
-    # Créer un DataFrame pour stocker les résultats
-    results = []
-    
-    for col in health_columns:
-        # Créer une table de contingence
-        contingency = pd.crosstab(df['ÉLIGIBILITÉ_AU_DON.'], df[col])
-        
-        # Calculer les pourcentages
-        contingency_pct = contingency.div(contingency.sum(axis=0), axis=1) * 100
-        
-        # Extraire les données pour "Oui"
-        if 'Oui' in contingency_pct.columns:
-            for eligibility, percentage in contingency_pct['Oui'].items():
-                results.append({
-                    'Condition': col.split('[')[-1].split(']')[0],
-                    'Éligibilité': eligibility,
-                    'Pourcentage': percentage,
-                    'Nombre': contingency.loc[eligibility, 'Oui']
-                })
-    
-    # Créer un DataFrame à partir des résultats
-    results_df = pd.DataFrame(results)
-    
-    # Créer un graphique à barres groupées avec Plotly
-    fig = px.bar(
-        results_df,
-        x='Condition',
-        y='Pourcentage',
-        color='Éligibilité',
-        barmode='group',
-        text='Nombre',
-        title="Impact des conditions de santé sur l'éligibilité au don",
-        labels={'Pourcentage': 'Pourcentage de donneurs (%)', 'Condition': 'Condition de santé'},
-        color_discrete_sequence=px.colors.qualitative.Set1
-    )
-    
-    # Personnaliser le graphique
-    fig.update_layout(
-        xaxis_title="Condition de santé",
-        yaxis_title="Pourcentage de donneurs (%)",
-        legend_title="Éligibilité",
-        font=dict(size=12),
-        height=600
-    )
-    
-    return fig
+    categorical_columns = df.select_dtypes(include=['object']).columns
+    valid_columns = [col for col in categorical_columns if 1 < df[col].nunique() <= 10]
+
+    if len(valid_columns) >= 2:
+        target_column = None
+        for potential_target in ['ÉLIGIBILITÉ_AU_DON.', 'Éligibilité_au_don', 'Eligibilité']:
+            if potential_target in valid_columns:
+                target_column = potential_target
+                break
+
+        if target_column:
+            st.info(f"Variable cible détectée : **{target_column}**")
+            for col in valid_columns:
+                if col != target_column:
+                    contingency = pd.crosstab(df[target_column], df[col])
+                    chi2, p, dof, expected = stats.chi2_contingency(contingency)
+                    association = "✅ significative" if p < 0.05 else "❌ non significative"
+                    
+                    st.markdown(f"**Relation entre `{target_column}` et `{col}`**")
+                    st.write(f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}")
+                    
+                    contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
+                    fig = px.bar(contingency_pct, 
+                                 barmode='stack',
+                                 title=f"{target_column} vs {col} (p={p:.4f})",
+                                 labels={'value': 'Pourcentage (%)', 'index': target_column})
+                    fig.update_layout(template='plotly_white')
+                    st.plotly_chart(fig)
+
+                    with st.expander(f"Graphique en mosaïque pour {target_column} vs {col}"):
+                        fig_mosaic, ax = plt.subplots(figsize=(8, 6))
+                        mosaic_data = {(i, j): contingency.loc[i, j] for i in contingency.index for j in contingency.columns}
+                        mosaic(mosaic_data, ax=ax, title=f'{target_column} vs {col}')
+                        st.pyplot(fig_mosaic)
+
+        else:
+            st.warning("Aucune variable cible claire trouvée. Affichage de quelques relations aléatoires entre variables.")
+            for col1, col2 in zip(valid_columns, valid_columns[1:3]):
+                contingency = pd.crosstab(df[col1], df[col2])
+                chi2, p, dof, expected = stats.chi2_contingency(contingency)
+                association = "✅ significative" if p < 0.05 else "❌ non significative"
+
+                st.markdown(f"**Relation entre `{col1}` et `{col2}`**")
+                st.write(f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}")
+
+                fig = px.imshow(contingency,
+                                text_auto=True,
+                                aspect="auto",
+                                color_continuous_scale="Viridis")
+                fig.update_layout(title=f"{col1} vs {col2} (p={p:.4f})")
+                st.plotly_chart(fig)
+    else:
+        st.warning("Pas assez de variables catégorielles valides pour analyser les relations.")
+
 
 # Fonction pour créer un graphique de clustering des donneurs
 @st.cache_data
@@ -1328,79 +1331,25 @@ def main():
 
     
     elif page == "Santé et éligibilité":
-        st.header("🩺 Conditions de santé et éligibilité au don")
-        
-        if 'ÉLIGIBILITÉ_AU_DON.' in df.columns:
-            # Afficher des statistiques générales sur l'éligibilité
-            st.subheader("Répartition de l'éligibilité au don")
-            eligibility_counts = df['ÉLIGIBILITÉ_AU_DON.'].value_counts().reset_index()
-            eligibility_counts.columns = ['Statut', 'Nombre']
-            
-            fig = px.pie(
-                eligibility_counts,
-                values='Nombre',
-                names='Statut',
-                title="Répartition de l'éligibilité au don",
-                color_discrete_sequence=px.colors.qualitative.Set1
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Créer un graphique montrant l'impact des conditions de santé sur l'éligibilité
-            st.subheader("Impact des conditions de santé sur l'éligibilité")
-            health_fig = create_health_eligibility_chart(df)
-            st.plotly_chart(health_fig, use_container_width=True)
-            
-            # Analyser l'impact des facteurs démographiques sur l'éligibilité
-            st.subheader("Impact des facteurs démographiques sur l'éligibilité")
-            
-            # Sélectionner le facteur démographique
-            demo_columns = [col for col in df.columns if any(term in col for term in 
-                           ['Genre', 'Age', 'Niveau', 'Situation', 'Profession'])]
-            
-            if demo_columns:
-                demo_col = st.selectbox(
-                    "Sélectionnez un facteur démographique",
-                    demo_columns
-                )
-                
-                # Créer une table de contingence
-                contingency = pd.crosstab(df[demo_col], df['ÉLIGIBILITÉ_AU_DON.'])
-                
-                # Calculer les pourcentages par ligne
-                contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
-                
-                # Convertir en format long pour Plotly
-                contingency_long = contingency_pct.reset_index().melt(
-                    id_vars=demo_col,
-                    var_name='Éligibilité',
-                    value_name='Pourcentage'
-                )
-                
-                fig = px.bar(
-                    contingency_long,
-                    x=demo_col,
-                    y='Pourcentage',
-                    color='Éligibilité',
-                    barmode='group',
-                    title=f"Éligibilité au don par {demo_col}",
-                    labels={'Pourcentage': 'Pourcentage (%)', demo_col: demo_col, 'Éligibilité': 'Éligibilité'}
-                )
-                
-                fig.update_layout(
-                    xaxis_title=demo_col,
-                    yaxis_title="Pourcentage (%)",
-                    legend_title="Éligibilité",
-                    font=dict(size=12),
-                    height=500,
-                    xaxis={'categoryorder': 'total descending'}
-                )
-                
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.warning("Aucun facteur démographique identifié dans les données.")
-        else:
-            st.warning("La colonne d'éligibilité au don n'est pas disponible dans ce jeu de données.")
+        st.header("🩺 Conditions de santé et éligibilité au don")   
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
+        if dataset == "2019":
+            analyze_categorical_relationships(df_2019, "Données 2019")
+        elif dataset == "2020":
+            analyze_categorical_relationships(df_2020, "Données 2020")
+        else :
+            analyze_categorical_relationships(df_volontaire, "Données volontaire")
+
+       # Charger les données
+    df_2019, df_2020, df_volontaire =load_data() 
+    # Sélectionner le DataFrame en fonction du choix
+    df = df_2019 if dataset == "2019" else df_volontaire
     
     elif page == "Profils des donneurs":
         st.header("👥 Profils des donneurs")
