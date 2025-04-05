@@ -80,7 +80,7 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 from scipy import stats
 from statsmodels.graphics.mosaicplot import mosaic
-
+nltk.download('punkt_tab')
 
 
     
