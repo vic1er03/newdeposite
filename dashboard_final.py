@@ -1348,8 +1348,6 @@ def main():
 
     # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
-    # Sélectionner le DataFrame en fonction du choix
-    df = df_2019 if dataset == "2019" else df_volontaire
     
     elif page == "Profils des donneurs":
         st.header("👥 Profils des donneurs")
