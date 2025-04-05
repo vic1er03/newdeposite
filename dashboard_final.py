@@ -1545,8 +1545,7 @@ def main():
         st.header("💬 Analyse de sentiment des retours")
         nltk.download("vader_lexicon")
         sia = SentimentIntensityAnalyzer()
-        # Créer des visualisations pour l'analyse de sentiment
-        sentiment_fig, wordcloud_path, comments_df = create_sentiment_analysis(df)
+        
         if "Si_autres_raison_préciser_" in df_volontaires.columns:
             df_volontaires["Sentiment"] = df_volontaires["Si_autres_raison_préciser_"].dropna().apply(lambda x: sia.polarity_scores(str(x))["compound"])
             sentiment_counts = df_volontaires["Sentiment"].apply(lambda x: "Positif" if x > 0 else "Négatif" if x < 0 else "Neutre").value_counts()
