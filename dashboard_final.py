@@ -1346,7 +1346,7 @@ def main():
         else :
             analyze_categorical_relationships(df_volontaire, "Données volontaire")
 
-       # Charger les données
+    # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
     # Sélectionner le DataFrame en fonction du choix
     df = df_2019 if dataset == "2019" else df_volontaire
