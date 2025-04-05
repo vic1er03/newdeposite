@@ -790,12 +790,12 @@ def create_sentiment_analysis(df):
                     title="Analyse de sentiment des commentaires",
                     color_discrete_sequence=px.colors.qualitative.Set3
                 )
-                st.pyplot(fig1)
+                
                 fig1.update_layout(
                     font=dict(size=12),
                     height=400
                 )
-                st.pyplot(fig1)
+                st.plotly_chart(fig1)
                 # Créer un nuage de mots des commentaires les plus fréquents
                 from wordcloud import WordCloud
                 
