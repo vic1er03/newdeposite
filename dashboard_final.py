@@ -740,7 +740,7 @@ def create_sentiment_analysis(df):
     """
     # Détecter les colonnes textuelles susceptibles d'être des commentaires
     comment_columns = [col for col in df.columns if any(term in col.lower() for term in 
-                      ['préciser', 'raison', 'commentaire', 'feedback'])]
+                      ['préciser','autre', 'commentaire', 'feedback'])]
 
     if not comment_columns:
         st.warning("Aucune colonne de commentaires trouvée.")
