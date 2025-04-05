@@ -990,6 +990,9 @@ def analyze_distributions(df, sheet_name):
 
 
 
+        
+
+
 # Interface principale du tableau de bord
 def main():
     # Charger les données
