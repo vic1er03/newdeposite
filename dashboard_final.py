@@ -777,6 +777,12 @@ def create_sentiment_analysis(df):
                 
                 # Appliquer l'analyse de sentiment
                 comments_df['Sentiment'] = comments_df[selected_col].apply(classify_sentiment)
+
+                def classify_sentiments(text):
+                    scores = sias.polarity_scores(text)
+                    return scores
+                comments_df['Score'] = comments_df[selected_col].apply(classify_sentiments)
+
                 
                 # Compter les sentiments
                 sentiment_counts = comments_df['Sentiment'].value_counts().reset_index()
