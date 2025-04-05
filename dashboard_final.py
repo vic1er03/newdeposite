@@ -1542,9 +1542,6 @@ def main():
         
         if "Si_autres_raison_préciser_" in df_volontaires.columns:
             df_volontaires["Sentiment"] = df_volontaires["Si_autres_raison_préciser_"].dropna().apply(lambda x: sia.polarity_scores(str(x))["compound"])
-            sentiment_counts = df_volontaires["Sentiment"].apply(lambda x: "Positif" if x > 0 else "Négatif" if x < 0 else "Neutre").value_counts()
-            fig = px.pie(sentiment_counts, names=sentiment_counts.index, title="Répartition des sentiments")
-            st.plotly_chart(fig)
             text = " ".join(str(f) for f in df_volontaires["Si_autres_raison_préciser_"].dropna())
             wordcloud = WordCloud(width=800, height=400, background_color="white").generate(text)
             st.image(wordcloud.to_array(), caption="Nuage de Mots des Feedbacks", use_column_width=True)
