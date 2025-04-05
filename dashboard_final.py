@@ -24,7 +24,13 @@ import nltk
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from tqdm import tqdm
+
+import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WorldNetLemmatizer
+
 from textblob import TextBlob
 from wordcloud import WordCloud
 from sklearn.metrics import roc_curve, auc, classification_report,confusion_matrix
@@ -739,30 +745,31 @@ def create_sentiment_analysis(df):
         
         # Filtrer les commentaires non vides
         comments_df = df[df[selected_col].notna() & (df[selected_col] != '')].copy()
+        def preprocess_text(text):
+            tokens=word_tokenize(text.lower())
+            filtered_tokens=[token for token in tokens if token not in stopwords.words('french')]
+
+            lemmatizer=WordNetLemmatizer()
+            lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]
+
+            processed_text=' '.join(lemmatized_tokens)
+        return processed_text
+        comments_df[selected_col]=comments_df[selected_col].apply(preprocess_text)
         
+            
         if len(comments_df) > 0:
             # Télécharger les ressources NLTK si nécessaire
             try:
                 nltk.download('vader_lexicon', quiet=True)
-                
+                nltk.download('all')
                 # Initialiser l'analyseur de sentiment
                 sia = SentimentIntensityAnalyzer()
                 
                 # Fonction pour classifier le sentiment
                 def classify_sentiment(text):
-                    if pd.isna(text) or text == '':
-                        return 'Neutre'
-                    
-                    # Utiliser TextBlob pour l'analyse de sentiment en français
-                    blob = TextBlob(str(text))
-                    polarity = blob.sentiment.polarity
-                    
-                    if polarity > 0.1:
-                        return 'Positif'
-                    elif polarity < -0.1:
-                        return 'Négatif'
-                    else:
-                        return 'Neutre'
+                    scores = analyzer.polarity_scores(text)
+                    sentiment = 1 if scores['pos']>0 else 0
+                return sentiment 
                 
                 # Appliquer l'analyse de sentiment
                 comments_df['Sentiment'] = comments_df[selected_col].apply(classify_sentiment)
