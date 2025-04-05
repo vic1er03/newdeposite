@@ -121,9 +121,9 @@ def load_data():
     """
     #Charge les données prétraitées à partir des fichiers CSV.
     """
-    data_2019_path ="data_2019_pretraite.csv"
+    data_2019_path = "data_2019_preprocessed.csv"
     data_2020_path = "data_2020_pretraite.csv"
-    data_volontaire_path = "data_Volontaire_pretraite.csv"
+    data_volontaire_path = "data_volontaire_preprocessed.csv"
 
     df_2019 = pd.read_csv(data_2019_path)
     df_2020 = pd.read_csv(data_2020_path)
@@ -134,7 +134,7 @@ def load_data():
     # Convertir les colonnes de dates au format datetime
     date_columns = [col for col in df_2019.columns if 'date' in col.lower()]
     for col in date_columns:
-        if col in df_2019.columns:
+        if col in df_2019tr.columns:
             try:
                 df_2019[col] = pd.to_datetime(df_2019[col], errors='coerce')
             except:
@@ -1015,6 +1015,7 @@ def main():
     df = df_2019 if dataset == "2019" else df_volontaire
     
     if page == "Accueil":
+        st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
         st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
         st.markdown("""
         Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
@@ -1036,6 +1037,13 @@ def main():
     # Page d'accueil
     
     if page == "Aperçu des données":
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
         st.header("Aperçu des Données")
         # Configuration matplotlib
         plt.style.use('seaborn-v0_8-whitegrid')
@@ -1081,7 +1089,9 @@ def main():
         else :
             Apercue(df_volontaire)
             
-        
+     # Charger les données
+    df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
+    
         
             
            
