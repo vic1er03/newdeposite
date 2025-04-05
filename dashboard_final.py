@@ -30,6 +30,8 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from textblob import Blobber
+from textblob_fr import PatternTagger, PatternAnalyzer
 
 from textblob import TextBlob
 from wordcloud import WordCloud
