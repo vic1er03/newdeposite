@@ -25,7 +25,7 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from tqdm import tqdm
 
-import nltk
+#import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -81,7 +81,7 @@ import plotly.express as px
 from scipy import stats
 from statsmodels.graphics.mosaicplot import mosaic
 nltk.download('punkt_tab')
-
+nltk.download('wordnet')
 
     
 
