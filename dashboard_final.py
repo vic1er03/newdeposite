@@ -767,8 +767,8 @@ def create_sentiment_analysis(df):
                 
                 # Fonction pour classifier le sentiment
                 def classify_sentiment(text):
-                    scores = analyzer.polarity_scores(text)
-                    sentiment = 1 if scores['pos']>0 else 0
+                    scores = sia.polarity_scores(text)
+                    sentiment = 1 if scores['pos']>0.05 else (-1 if scores['pos']<-0.05 else 0)
                 return sentiment 
                 
                 # Appliquer l'analyse de sentiment
@@ -786,12 +786,12 @@ def create_sentiment_analysis(df):
                     title="Analyse de sentiment des commentaires",
                     color_discrete_sequence=px.colors.qualitative.Set3
                 )
-                
+                st.pyplot(fig1)
                 fig1.update_layout(
                     font=dict(size=12),
                     height=400
                 )
-                
+                st.pyplot(fig1)
                 # Créer un nuage de mots des commentaires les plus fréquents
                 from wordcloud import WordCloud
                 
@@ -807,10 +807,7 @@ def create_sentiment_analysis(df):
                 plt.axis('off')
                 plt.tight_layout()
                 
-                # Sauvegarder l'image
-                wordcloud_path = r"C:\Users\Ultra Tech\Desktop\wordcloud.png"
-                plt.savefig(wordcloud_path)
-                plt.close()
+               
                 
                 return fig1, wordcloud_path, comments_df
             except Exception as e:
