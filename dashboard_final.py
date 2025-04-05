@@ -764,9 +764,9 @@ def create_sentiment_analysis(df):
             blob = tb(str(text))
             polarite = blob.sentiment[0]
             # Catégorisation
-            if polarite > 0.05:
+            if polarite > 0.01:
                 return "Positif"
-            elif polarite < -0.05:
+            elif polarite < -0.01:
                 return "Négatif"
             else:
                 return "Neutre"
