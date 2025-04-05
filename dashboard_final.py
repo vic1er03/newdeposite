@@ -121,9 +121,16 @@ def load_data():
     """
     #Charge les données prétraitées à partir des fichiers CSV.
     """
+    data_2019_path ="data_2019_pretraite.csv"
+    data_2020_path = "data_2020_pretraite.csv"
+    data_volontaire_path = "data_Volontaire_pretraite.csv"
+
     df_2019 = pd.read_csv(data_2019_path)
+    df_2020 = pd.read_csv(data_2020_path)
     df_volontaire = pd.read_csv(data_volontaire_path)
+
     
+
     # Convertir les colonnes de dates au format datetime
     date_columns = [col for col in df_2019.columns if 'date' in col.lower()]
     for col in date_columns:
@@ -141,7 +148,7 @@ def load_data():
             except:
                 pass
     
-    return df_2019, df_volontaire
+    return df_2019, df_2020, df_volontaire
 
 @st.cache_data
 
@@ -841,44 +848,7 @@ def Apercue(df_2019):
             else:
                 st.info("Aucune valeur manquante dans les données 2019.")
         
-
-# Interface principale du tableau de bord
-def main():
-    # Charger les données
-    df_2019, df_volontaire =load_data() #"df,df_volontaires"
-    
-    # Barre latérale pour la navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio(
-        "Sélectionnez une page",
-        ["Accueil","Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
-         "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
-         "Analyse de sentiment", "Prédiction d'éligibilité"]
-    )
-    
-    # Sélection du jeu de données
-    st.sidebar.title("Jeu de données")
-    dataset = st.sidebar.radio(
-        "Sélectionnez un jeu de données",
-        ["2019", "Volontaire","2020"]
-    )
-    
-    # Sélectionner le DataFrame en fonction du choix
-    df = df_2019 if dataset == "2019" else df_volontaire
-    
-    if page == "Accueil":
-        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
-        st.markdown("""
-        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
-        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
-        """)
-        image_file="image.jpg"
-        set_background(image_file)
-        """
-        Fonction principale qui crée l'interface du tableau de bord Streamlit.
-        """
-
-    # Visualisation des valeurs manquantes
+# Visualisation des valeurs manquantes
 def visualize_missing_values(df, title):
     missing = df.isnull().sum().sort_values(ascending=False)
     missing = missing[missing > 0]
@@ -1019,6 +989,44 @@ def analyze_distributions(df, sheet_name):
                     st.write(f"- {val}: {count} ({value_counts_pct[val]:.1f}%)")
 
 
+
+# Interface principale du tableau de bord
+def main():
+    # Charger les données
+    df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
+    
+    # Barre latérale pour la navigation
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio(
+        "Sélectionnez une page",
+        ["Accueil","Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
+         "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
+         "Analyse de sentiment", "Prédiction d'éligibilité"]
+    )
+    
+    # Sélection du jeu de données
+    st.sidebar.title("Jeu de données")
+    dataset = st.sidebar.radio(
+        "Sélectionnez un jeu de données",
+        ["2019", "Volontaire","2020"]
+    )
+    
+    # Sélectionner le DataFrame en fonction du choix
+    df = df_2019 if dataset == "2019" else df_volontaire
+    
+    if page == "Accueil":
+        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
+        st.markdown("""
+        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
+        """)
+        image_file="Image.jpg"
+        set_background(image_file)
+        """
+        Fonction principale qui crée l'interface du tableau de bord Streamlit.
+        """
+
+    
 
     # Titre et introduction
     
