@@ -1555,9 +1555,9 @@ def main():
             wordcloud = WordCloud(width=800, height=400, background_color="white").generate(text)
             st.image(wordcloud.to_array(), caption="Nuage de Mots des Feedbacks", use_column_width=True)
         if dataset == "2019":
-            create_sentiment_analysis(df_2019,"Donnée 2019")
+            create_sentiment_analysis(df_2019)
         if dataset == "Volontaire":
-            create_sentiment_analysis(df_volontaire,"Donnée volontaire")
+            create_sentiment_analysis(df_volontaire)
         
         
         
