@@ -214,18 +214,25 @@ def get_coordinates_with_cache(row, geo_cache, geolocator, geocode):
 
 # Fonction pour créer la carte Folium
 def create_map(df):
-    # Créer une carte centrée sur Douala
-    m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles='CartoDB positron')
+    # Créer une carte sans tuiles (fond blanc)
+    m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles=None)
     
-    # Créer un cluster de marqueurs pour améliorer les performances
+    # Ajouter un fond blanc personnalisé (carte vide)
+    folium.raster_layers.TileLayer(
+        tiles='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        attr='CartoDB',
+        name='Blanc',
+        control=False,
+        overlay=False
+    ).add_to(m)
+    
+    # Cluster de marqueurs
     marker_cluster = MarkerCluster().add_to(m)
     
-    # Ajouter des marqueurs pour chaque donneur
     for idx, row in df.iterrows():
         if pd.isna(row['latitude']) or pd.isna(row['longitude']):
             continue
-            
-        # Préparer le contenu du popup
+        
         popup_content = f"""
         <b>{row.get('Genre', 'N/A')}, {row.get('Age', 'N/A')} ans</b><br>
         <i>{row.get('Profession', 'N/A')}</i><br>
@@ -234,11 +241,9 @@ def create_map(df):
         Arrondissement: {row.get('Arrondissement', 'N/A')}
         """
         
-        # Déterminer la couleur du marqueur en fonction de l'éligibilité
         eligibilite = str(row.get('Eligibilite_Don', '')).lower()
         color = 'green' if eligibilite == 'oui' else 'red' if eligibilite == 'non' else 'blue'
         
-        # Ajouter le marqueur au cluster
         folium.Marker(
             location=[row['latitude'], row['longitude']],
             popup=folium.Popup(popup_content, max_width=250),
@@ -246,6 +251,7 @@ def create_map(df):
         ).add_to(marker_cluster)
     
     return m
+
 
 # Fonction pour créer une carte de distribution géographique
 @st.cache_data
