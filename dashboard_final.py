@@ -280,7 +280,13 @@ def create_geo_map(df, location_column, color_column=None, zoom_start=10):
     
     # Créer une carte centrée sur Douala
     m = folium.Map(location=default_coords, zoom_start=zoom_start, tiles="OpenStreetMap")
-    
+    folium.raster_layers.TileLayer(
+        tiles='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        attr='CartoDB',
+        name='Blanc',
+        control=False,
+        overlay=False
+    ).add_to(m)
     # Créer un cluster de marqueurs pour améliorer les performances
     marker_cluster = MarkerCluster().add_to(m)
     
@@ -1222,7 +1228,13 @@ def main():
             Éligible: {row.get('Eligibilite_Don', 'N/A')}<br>
             Quartier: {row['Quartier']}
             """
-        
+            folium.raster_layers.TileLayer(
+                tiles='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                attr='CartoDB',
+                name='Blanc',
+                control=False,
+                overlay=False
+            ).add_to(m)
             folium.Marker(
                 location=[row['latitude'], row['longitude']],
                 popup=folium.Popup(popup_content, max_width=250),
