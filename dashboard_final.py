@@ -1023,7 +1023,7 @@ def main():
         Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
         permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
         """)
-        image_file="Image.jpg"
+        image_file="Image_sang.jpg"
         set_background(image_file)
         """
         Fonction principale qui crée l'interface du tableau de bord Streamlit.
