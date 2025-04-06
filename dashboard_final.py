@@ -5,6 +5,8 @@ pour répondre aux objectifs du concours de data visualisation.
 
 import streamlit as st
 import pandas as pd
+import pygwalker as pyg
+from pygwalker.api.streamlit import StreamlitRenderer
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -1017,7 +1019,7 @@ def main():
         "Sélectionnez une page",
         ["Accueil","Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
          "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
-         "Analyse de sentiment", "Prédiction d'éligibilité"]
+         "Analyse de sentiment", "Prédiction d'éligibilité","Bonus"]
     )
     
     # Sélection du jeu de données
@@ -1564,7 +1566,29 @@ def main():
         
         
             
-    
+    elif page == "Bonus":
+        if dataset=="2019":
+            pyg_app=StreamlitRenderer(df_2019)
+            pyg_app.explorer()
+        if dataset=="2020":
+            pyg_app=StreamlitRenderer(df_2020)
+            pyg_app.explorer()
+        else :
+            pyg_app=StreamlitRenderer(df_volontaire)
+            pyg_app.explorer()
+        
+        uploaded_file = st.file_uploader("Ton fichier Csv")
+        if uploaded_file is not None :
+            data=pd.read_csv(uploaded_file)
+            pyg_app=StreamlitRenderer(data)
+            pyg_app.explorer()
+        
+        uploaded_files = st.file_uploader("Ton fichier excel")
+        if uploaded_files is not None :
+            data=pd.read_excel(uploaded_files)
+            pyg_app=StreamlitRenderer(data)
+            pyg_app.explorer()
+            
     elif page == "Prédiction d'éligibilité":
         st.header("🔮 Prédiction d'éligibilité au don")
         
