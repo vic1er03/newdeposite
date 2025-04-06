@@ -18,3 +18,4 @@ wordcloud
 xlsxwriter
 geopy
 openpyxl
+pygwalker
