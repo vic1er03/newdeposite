@@ -1228,13 +1228,6 @@ def main():
             Éligible: {row.get('Eligibilite_Don', 'N/A')}<br>
             Quartier: {row['Quartier']}
             """
-            folium.raster_layers.TileLayer(
-                tiles='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-                attr='CartoDB',
-                name='Blanc',
-                control=False,
-                overlay=False
-            ).add_to(m)
             folium.Marker(
                 location=[row['latitude'], row['longitude']],
                 popup=folium.Popup(popup_content, max_width=250),
