@@ -26,6 +26,7 @@ import nltk
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from tqdm import tqdm
+from PIL import Image
 
 #import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
