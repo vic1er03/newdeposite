@@ -1002,10 +1002,20 @@ def analyze_distributions(df, sheet_name):
 
             fig.update_layout(title=f'Distribution de {col} - {sheet_name}', height=500, showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
-
+            
+            # Supposons que value_counts et value_counts_pct soient déjà définis.
             with st.expander(f"Détails sur {col}"):
                 for val, count in value_counts.items():
-                    st.write(f"- {val}: {count} ({value_counts_pct[val]:.1f}%)")
+                    col1, col2 = st.columns([1, 2])  # Créer deux colonnes pour séparer le titre et la valeur
+                    with col1:
+                        # Bloc titre avec icône et nom, couleur bleu ciel et titre en gras
+                        st.markdown(f"<div style='background-color: #87CEFA; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                    f"<strong>{val}</strong> <span style='margin-left: 10px;'>🔍</span></div>", unsafe_allow_html=True)
+                    with col2:
+                        # Bloc valeur, encadré par un rectangle, sans couleur de fond
+                        st.markdown(f"<div style='border: 1px solid #ccc; padding: 10px; border-radius: 5px;'>"
+                                    f"Count: {count} <br> Percentage: {value_counts_pct[val]:.1f}%</div>", unsafe_allow_html=True)
+            
 
 
 
