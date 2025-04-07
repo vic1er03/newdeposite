@@ -1032,7 +1032,7 @@ def main():
             menu_icon="cast",
             default_index=0,
         )
-    
+        st.write(f"Page sélectionnée : {selected}")
     # Sélection du jeu de données
     st.sidebar.title("Jeu de données")
     dataset = st.sidebar.radio(
