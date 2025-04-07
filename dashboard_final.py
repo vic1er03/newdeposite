@@ -1107,6 +1107,7 @@ def main():
             analyze_distributions(df_volontaire, "Données Volontaire")
 
        # CSS personnalisé pour styling clair et propre
+        # CSS personnalisé
         st.markdown("""
             <style>
                 .kpi-container {
@@ -1117,12 +1118,12 @@ def main():
                 }
         
                 .kpi-top {
-                    background-color: #f4f4f4;
+                    background-color: #f0f0f0; /* gris clair */
                     padding: 10px 15px;
-                    border-radius: 12px 12px 0 0;
+                    border-radius: 12px;
                     text-align: center;
                     width: 100%;
-                    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+                    box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
                     font-weight: bold;
                     font-size: 16px;
                 }
@@ -1135,10 +1136,14 @@ def main():
                     margin-top: 5px;
                 }
         
+                .kpi-spacer {
+                    height: 15px;
+                }
+        
                 .kpi-bottom {
-                    background-color: #d0e7ff;
+                    background-color: #d0e7ff;  /* bleu ciel */
                     padding: 15px;
-                    border-radius: 0 0 12px 12px;
+                    border-radius: 12px;
                     text-align: center;
                     width: 100%;
                     font-size: 24px;
@@ -1149,7 +1154,7 @@ def main():
             </style>
         """, unsafe_allow_html=True)
         
-        # Colonnes pour 3 blocs
+        # 3 Colonnes
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -1159,6 +1164,7 @@ def main():
                         <div class="kpi-icon">🩸</div>
                         <div class="kpi-label">Donneurs 2019</div>
                     </div>
+                    <div class="kpi-spacer"></div>
                     <div class="kpi-bottom">{len(df_2019)}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1170,6 +1176,7 @@ def main():
                         <div class="kpi-icon">🩸</div>
                         <div class="kpi-label">Donneurs 2020</div>
                     </div>
+                    <div class="kpi-spacer"></div>
                     <div class="kpi-bottom">{len(df_2020)}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1181,9 +1188,11 @@ def main():
                         <div class="kpi-icon">🩸</div>
                         <div class="kpi-label">Volontaires</div>
                     </div>
+                    <div class="kpi-spacer"></div>
                     <div class="kpi-bottom">{len(df_volontaire)}</div>
                 </div>
             """, unsafe_allow_html=True)
+
 
         
         if dataset=="2019":
