@@ -1033,14 +1033,15 @@ def main():
     
     if page == "Accueil":
         # Afficher l'image en haut, sur toute la largeur
-    image = Image.open(image_file)
-    st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
-    st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
-    st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
-    st.markdown("""
-    Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
-    permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
-    """)
+        image_file="Image_sang.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
+        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
+        st.markdown("""
+        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
+        """)
         
         #set_background(image_file)
         """
