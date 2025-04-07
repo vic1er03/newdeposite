@@ -1031,14 +1031,24 @@ def main():
     
     
     if page == "Accueil":
+        # Créer deux colonnes pour placer l’image en haut
+        col1, col2 = st.columns([2, 3])  # Ajuste les ratios selon le design souhaité
+        image_file="Image_sang.jpg"
+        with col1:
+            image = Image.open(image_file)
+            st.image(image, use_column_width=True)
+        
+        with col2:
+            st.write("")  # Espace vide ou texte complémentaire si tu veux
+        
         st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
         st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
         st.markdown("""
         Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
         permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
         """)
-        image_file="Image_sang.jpg"
-        set_background(image_file)
+        
+        #set_background(image_file)
         """
         Fonction principale qui crée l'interface du tableau de bord Streamlit.
         """
