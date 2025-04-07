@@ -911,8 +911,8 @@ def analyze_distributions(df, sheet_name):
     if len(numeric_columns) > 0:
         st.subheader("Variables numériques")
         selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
-
-       # Exemple de couleurs personnalisées pour chaque graphique
+        
+        # Exemple de couleurs personnalisées pour chaque graphique
         colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
         
         # Nombre de graphiques
@@ -930,6 +930,10 @@ def analyze_distributions(df, sheet_name):
             # Créer une figure avec plusieurs sous-graphique
             fig, ax = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(n_cols * 5, n_rows * 4))
             
+            # Vérifier si ax est une matrice ou un seul axe
+            if n_rows == 1 and n_cols == 1:
+                ax = np.array([ax])  # Convertir en tableau 2D pour rendre l'indexation uniforme
+        
             # Choisir une couleur différente pour chaque graphique
             color = colors[i % len(colors)]
             
@@ -968,6 +972,7 @@ def analyze_distributions(df, sheet_name):
         
             # Affichage de la figure
             st.pyplot(fig)
+
 
         # Graphique interactif Violin
         if len(selected_numeric) > 1:
