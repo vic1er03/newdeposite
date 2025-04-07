@@ -366,7 +366,7 @@ def analyze_categorical_relationships(df, sheet_name):
                                  barmode='stack',
                                  title=f"{target_column} vs {col} (p={p:.4f})",
                                  labels={'value': 'Pourcentage (%)', 'index': target_column},
-                                text=contingency_pct['value'])
+                                 text=contingency_pct['value'])
                     
                     # Afficher automatiquement les textes sur les barres
                     fig.update_traces(texttemplate='%{text:.1f}%', textposition='inside')
