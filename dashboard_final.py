@@ -1106,34 +1106,71 @@ def main():
             visualize_missing_values(df_volontaire, "Données Volontaire")
             analyze_distributions(df_volontaire, "Données Volontaire")
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown('<div class="metric-box">'
-                                    '<h4>Nombre de donneurs (2019)</h4>'
-                                    '<h2>Nombre de donneurs (2020)</p>'
-                                    '<p>Nombre de donneurs (volontaire)</p>'
-                                    '</div>',
-                        unsafe_alloz_html=True)
-                        
-            #st.metric("Nombre de donneurs (2019)", len(df_2019))
-        with col2:
-            st.markdown(f'''<div class="metric-box">'
-                                    '<h4>Nombre de donneurs (2019)</h4>'
-                                    '<h2>{len(df_2019)}</h2>'
-                                    '</div>''',
-                        unsafe_alloz_html=True)
-            #st.metric("Nombre de donneurs (2020)", len(df_2020))
-        with col3:
-            st.metric("Nombre de donneurs (Volontaires)", len(df_volontaire))
+        # CSS personnalisé
+        st.markdown("""
+            <style>
+                .metric-block {
+                    background-color: #e6f0fa;
+                    padding: 15px;
+                    border-radius: 12px;
+                    text-align: center;
+                    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+                }
+                .metric-icon {
+                    font-size: 30px;
+                }
+                .metric-label {
+                    font-weight: bold;
+                    margin: 5px 0;
+                    font-size: 16px;
+                }
+                .metric-value {
+                    font-size: 24px;
+                    color: #0066cc;
+                    font-weight: bold;
+                }
+            </style>
+        """, unsafe_allow_html=True)
         
-        st.subheader("Aperçu des données")
-
-        if dataset=="2019":
-            Apercue(df_2019)
-        elif dataset=="2020":
-            Apercue(df_2020)
-        else :
-            Apercue(df_volontaire)
+        # Colonnes pour les 3 métriques
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown(f"""
+                <div class="metric-block">
+                    <div class="metric-icon">🩸</div>
+                    <div class="metric-label">Nombre de donneurs (2019)</div>
+                    <div class="metric-value">{len(df_2019)}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f"""
+                <div class="metric-block">
+                    <div class="metric-icon">🩸</div>
+                    <div class="metric-label">Nombre de donneurs (2020)</div>
+                    <div class="metric-value">{len(df_2020)}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f"""
+                <div class="metric-block">
+                    <div class="metric-icon">🩸</div>
+                    <div class="metric-label">Donneurs Volontaires</div>
+                    <div class="metric-value">{len(df_volontaire)}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        
+                
+                st.subheader("Aperçu des données")
+        
+                if dataset=="2019":
+                    Apercue(df_2019)
+                elif dataset=="2020":
+                    Apercue(df_2020)
+                else :
+                    Apercue(df_volontaire)
             
      # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
