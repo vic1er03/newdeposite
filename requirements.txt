@@ -19,4 +19,4 @@ xlsxwriter
 geopy
 openpyxl
 pygwalker
-streamlit.components
+
