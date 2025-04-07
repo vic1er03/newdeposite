@@ -1559,7 +1559,7 @@ def main():
             st.warning("Impossible d'analyser la fidélisation car les informations nécessaires ne sont pas disponibles dans les données.")
     
     elif page == "Analyse de sentiment":
-         # Afficher l'image en haut, sur toute la largeur
+        # Afficher l'image en haut, sur toute la largeur
         image_file="Analyse_sentiment.jpg"
         image = Image.open(image_file)
         st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
@@ -1586,10 +1586,7 @@ def main():
         if dataset == "Volontaire":
             create_sentiment_analysis(df_volontaire)
         
-        
-        
-            
-   elif page == "Bonus" : 
+    elif page == "Bonus" :
         st.markdown("### 🔍 Bonus - Exploration Interactive avec Pygwalker")
     
         # Section Pygwalker selon le dataset choisi
