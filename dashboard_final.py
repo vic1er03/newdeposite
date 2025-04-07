@@ -1033,1039 +1033,1039 @@ def main():
             default_index=0,
         )
     
-        # Sélection du jeu de données
-        st.sidebar.title("Jeu de données")
-        dataset = st.sidebar.radio(
-            "Sélectionnez un jeu de données",
-            ["2019", "Volontaire","2020"]
-        )
-        
-        
-        if page == "Accueil":
-            # Afficher l'image en haut, sur toute la largeur
-            image_file="Image_sang.jpg"
-            image = Image.open(image_file)
-            st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
-            st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
-            st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
-            st.markdown("""
-            Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
-            permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
-            """)
-            
-            #set_background(image_file)
-            """
-            Fonction principale qui crée l'interface du tableau de bord Streamlit.
-            """
+    # Sélection du jeu de données
+    st.sidebar.title("Jeu de données")
+    dataset = st.sidebar.radio(
+        "Sélectionnez un jeu de données",
+        ["2019", "Volontaire","2020"]
+    )
     
-        
     
-        # Titre et introduction
+    if page == "Accueil":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Image_sang.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
+        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
+        st.markdown("""
+        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
+        """)
         
-        
-        
-        # Afficher la page sélectionnée
-        # Page d'accueil
-        
-        if page == "Aperçu des données":
-            data_2019_path ="data_2019_pretraite.csv"
-            data_2020_path = "data_2020_pretraite.csv"
-            data_volontaire_path = "data_Volontaire_pretraite.csv"
-        
-            df_2019 = pd.read_csv(data_2019_path)
-            df_2020 = pd.read_csv(data_2020_path)
-            df_volontaire = pd.read_csv(data_volontaire_path)
-            st.header("Aperçu des Données")
-            # Configuration matplotlib
-            plt.style.use('seaborn-v0_8-whitegrid')
-            plt.rcParams['figure.figsize'] = (12, 8)
-            plt.rcParams['font.size'] = 12
-            plt.rcParams['axes.labelsize'] = 14
-            plt.rcParams['axes.titlesize'] = 16
-            plt.rcParams['xtick.labelsize'] = 12
-            plt.rcParams['ytick.labelsize'] = 12
-            plt.rcParams['legend.fontsize'] = 12
-            plt.rcParams['figure.titlesize'] = 20
-           
-        
-            # Affichage selon le choix
-            if dataset == "2019":
-                visualize_missing_values(df_2019, "Données 2019")
-                analyze_distributions(df_2019, "Données 2019")
-            elif dataset== "2020":
-                visualize_missing_values(df_2020, "Données 2020")
-                analyze_distributions(df_2020, "Données 2020")
-            else:
-                visualize_missing_values(df_volontaire, "Données Volontaire")
-                analyze_distributions(df_volontaire, "Données Volontaire")
+        #set_background(image_file)
+        """
+        Fonction principale qui crée l'interface du tableau de bord Streamlit.
+        """
+
     
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Nombre de donneurs (2019)", len(df_2019))
-            with col2:
-                st.metric("Nombre de donneurs (2020)", len(df_2020))
-            with col3:
-                st.metric("Nombre de donneurs (Volontaires)", len(df_volontaire))
-            
-            st.subheader("Aperçu des données")
+
+    # Titre et introduction
     
-            if dataset=="2019":
-                Apercue(df_2019)
-            elif dataset=="2020":
-                Apercue(df_2020)
-            else :
-                Apercue(df_volontaire)
-                
-         # Charger les données
-        df_2019, df_2020, df_volontaire =load_data() 
-        # Sélectionner le DataFrame en fonction du choix
-        df = df_2019 if dataset == "2019" else df_volontaire
+    
+    
+    # Afficher la page sélectionnée
+    # Page d'accueil
+    
+    if page == "Aperçu des données":
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
+        st.header("Aperçu des Données")
+        # Configuration matplotlib
+        plt.style.use('seaborn-v0_8-whitegrid')
+        plt.rcParams['figure.figsize'] = (12, 8)
+        plt.rcParams['font.size'] = 12
+        plt.rcParams['axes.labelsize'] = 14
+        plt.rcParams['axes.titlesize'] = 16
+        plt.rcParams['xtick.labelsize'] = 12
+        plt.rcParams['ytick.labelsize'] = 12
+        plt.rcParams['legend.fontsize'] = 12
+        plt.rcParams['figure.titlesize'] = 20
+       
+    
+        # Affichage selon le choix
+        if dataset == "2019":
+            visualize_missing_values(df_2019, "Données 2019")
+            analyze_distributions(df_2019, "Données 2019")
+        elif dataset== "2020":
+            visualize_missing_values(df_2020, "Données 2020")
+            analyze_distributions(df_2020, "Données 2020")
+        else:
+            visualize_missing_values(df_volontaire, "Données Volontaire")
+            analyze_distributions(df_volontaire, "Données Volontaire")
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Nombre de donneurs (2019)", len(df_2019))
+        with col2:
+            st.metric("Nombre de donneurs (2020)", len(df_2020))
+        with col3:
+            st.metric("Nombre de donneurs (Volontaires)", len(df_volontaire))
+        
+        st.subheader("Aperçu des données")
+
+        if dataset=="2019":
+            Apercue(df_2019)
+        elif dataset=="2020":
+            Apercue(df_2020)
+        else :
+            Apercue(df_volontaire)
+            
+     # Charger les données
+    df_2019, df_2020, df_volontaire =load_data() 
+    # Sélectionner le DataFrame en fonction du choix
+    df = df_2019 if dataset == "2019" else df_volontaire
+    
+    
+    if page == "Distribution géographique":
+        st.header("🗺️ Distribution géographique des donneurs")
+         # 1️⃣ Chargement des données (Fichier Excel)
+        #file_path = r"C:\Users\Ultra Tech\Desktop\Challenge dataset traité.xlsx"  # Mets le bon chemin
+        df_carte = df_volontaire.copy()
+        # 🔹 Dictionnaire des nouveaux noms de colonnes
+        new_column_names = {
+            "ID": "ID",
+            "Age": "Age",
+            "Horodateur": "Horodateur",
+            "Niveau_d'etude": "Niveau_Etude",
+            "Genre_": "Genre",
+            "Taille_": "Taille",
+            "Poids": "Poids",
+            "Situation_Matrimoniale_(SM)": "Statut_Matrimonial",
+            "Profession_": "Profession",
+            "Arrondissement_de_résidence_": "Arrondissement",
+            "Quartier_de_Résidence_": "Quartier",
+            "Nationalité_": "Nationalite",
+            "Religion_": "Religion",
+            "A-t-il_(elle)_déjà_donné_le_sang_": "Deja_Donneur",
+            "Si_oui_preciser_la_date_du_dernier_don._": "Date_Dernier_Don",
+            "Taux_d’hémoglobine_": "Taux_Hemoglobine",
+            "ÉLIGIBILITÉ_AU_DON.": "Eligibilite_Don",
+            "Raison_indisponibilité__[Est_sous_anti-biothérapie__]": "Sous_Antibiotherapie",
+            "Raison_indisponibilité__[Taux_d’hémoglobine_bas_]": "Hemoglobine_Bas",
+            "Raison_indisponibilité__[date_de_dernier_Don_<_3_mois_]": "Dernier_Don_3Mois",
+            "Raison_indisponibilité__[IST_récente_(Exclu_VIH,_Hbs,_Hcv)]": "IST_Recente",
+            "Date_de_dernières_règles_(DDR)__": "DDR",
+            "Raison_de_l’indisponibilité_de_la_femme_[La_DDR_est_mauvais_si_<14_jour_avant_le_don]": "DDR_Mauvaise",
+            "Raison_de_l’indisponibilité_de_la_femme_[Allaitement_]": "Allaitement",
+            "Raison_de_l’indisponibilité_de_la_femme_[A_accoucher_ces_6_derniers_mois__]": "Accouchement_6Mois",
+            "Raison_de_l’indisponibilité_de_la_femme_[Interruption_de_grossesse__ces_06_derniers_mois]": "Interruption_Grossesse",
+            "Raison_de_l’indisponibilité_de_la_femme_[est_enceinte_]": "Enceinte",
+            "Autre_raisons,__preciser_": "Autres_Raisons",
+            'Sélectionner_"ok"_pour_envoyer_': "Confirmation_OK",
+            "Raison_de_non-eligibilité_totale__[Antécédent_de_transfusion]": "Transfusion_Antecedent",
+            "Raison_de_non-eligibilité_totale__[Porteur(HIV,hbs,hcv)]": "Porteur_VIH_HBS_HCV",
+            "Raison_de_non-eligibilité_totale__[Opéré]": "Opere",
+            "Raison_de_non-eligibilité_totale__[Drepanocytaire]": "Drepanocytose",
+            "Raison_de_non-eligibilité_totale__[Diabétique]": "Diabete",
+            "Raison_de_non-eligibilité_totale__[Hypertendus]": "Hypertension",
+            "Raison_de_non-eligibilité_totale__[Asthmatiques]": "Asthme",
+            "Raison_de_non-eligibilité_totale__[Cardiaque]": "Probleme_Cardiaque",
+            "Raison_de_non-eligibilité_totale__[Tatoué]": "Tatouage",
+            "Raison_de_non-eligibilité_totale__[Scarifié]": "Scarification",
+            "Si_autres_raison_préciser_": "Autres_Raisons_Precises"
+        }
+        
+        # 🔹 Renommage des colonnes du DataFrame
+        df_carte.rename(columns=new_column_names, inplace=True)
+
         
         
-        if page == "Distribution géographique":
-            st.header("🗺️ Distribution géographique des donneurs")
-             # 1️⃣ Chargement des données (Fichier Excel)
-            #file_path = r"C:\Users\Ultra Tech\Desktop\Challenge dataset traité.xlsx"  # Mets le bon chemin
-            df_carte = df_volontaire.copy()
-            # 🔹 Dictionnaire des nouveaux noms de colonnes
-            new_column_names = {
-                "ID": "ID",
-                "Age": "Age",
-                "Horodateur": "Horodateur",
-                "Niveau_d'etude": "Niveau_Etude",
-                "Genre_": "Genre",
-                "Taille_": "Taille",
-                "Poids": "Poids",
-                "Situation_Matrimoniale_(SM)": "Statut_Matrimonial",
-                "Profession_": "Profession",
-                "Arrondissement_de_résidence_": "Arrondissement",
-                "Quartier_de_Résidence_": "Quartier",
-                "Nationalité_": "Nationalite",
-                "Religion_": "Religion",
-                "A-t-il_(elle)_déjà_donné_le_sang_": "Deja_Donneur",
-                "Si_oui_preciser_la_date_du_dernier_don._": "Date_Dernier_Don",
-                "Taux_d’hémoglobine_": "Taux_Hemoglobine",
-                "ÉLIGIBILITÉ_AU_DON.": "Eligibilite_Don",
-                "Raison_indisponibilité__[Est_sous_anti-biothérapie__]": "Sous_Antibiotherapie",
-                "Raison_indisponibilité__[Taux_d’hémoglobine_bas_]": "Hemoglobine_Bas",
-                "Raison_indisponibilité__[date_de_dernier_Don_<_3_mois_]": "Dernier_Don_3Mois",
-                "Raison_indisponibilité__[IST_récente_(Exclu_VIH,_Hbs,_Hcv)]": "IST_Recente",
-                "Date_de_dernières_règles_(DDR)__": "DDR",
-                "Raison_de_l’indisponibilité_de_la_femme_[La_DDR_est_mauvais_si_<14_jour_avant_le_don]": "DDR_Mauvaise",
-                "Raison_de_l’indisponibilité_de_la_femme_[Allaitement_]": "Allaitement",
-                "Raison_de_l’indisponibilité_de_la_femme_[A_accoucher_ces_6_derniers_mois__]": "Accouchement_6Mois",
-                "Raison_de_l’indisponibilité_de_la_femme_[Interruption_de_grossesse__ces_06_derniers_mois]": "Interruption_Grossesse",
-                "Raison_de_l’indisponibilité_de_la_femme_[est_enceinte_]": "Enceinte",
-                "Autre_raisons,__preciser_": "Autres_Raisons",
-                'Sélectionner_"ok"_pour_envoyer_': "Confirmation_OK",
-                "Raison_de_non-eligibilité_totale__[Antécédent_de_transfusion]": "Transfusion_Antecedent",
-                "Raison_de_non-eligibilité_totale__[Porteur(HIV,hbs,hcv)]": "Porteur_VIH_HBS_HCV",
-                "Raison_de_non-eligibilité_totale__[Opéré]": "Opere",
-                "Raison_de_non-eligibilité_totale__[Drepanocytaire]": "Drepanocytose",
-                "Raison_de_non-eligibilité_totale__[Diabétique]": "Diabete",
-                "Raison_de_non-eligibilité_totale__[Hypertendus]": "Hypertension",
-                "Raison_de_non-eligibilité_totale__[Asthmatiques]": "Asthme",
-                "Raison_de_non-eligibilité_totale__[Cardiaque]": "Probleme_Cardiaque",
-                "Raison_de_non-eligibilité_totale__[Tatoué]": "Tatouage",
-                "Raison_de_non-eligibilité_totale__[Scarifié]": "Scarification",
-                "Si_autres_raison_préciser_": "Autres_Raisons_Precises"
-            }
-            
-            # 🔹 Renommage des colonnes du DataFrame
-            df_carte.rename(columns=new_column_names, inplace=True)
-    
-            
-            
-            # 2️⃣ Initialisation du Géocodeur avec timeout
-            geolocator = Nominatim(user_agent="blood_donation_cameroon", timeout=10)
-            geocode = RateLimiter(geolocator.geocode, min_delay_seconds=2, max_retries=3)
-            
-            # 3️⃣ Charger le cache si existant
-            cache_file = "geo_cache.json"
-            if os.path.exists(cache_file):
-                with open(cache_file, "r") as f:
-                    geo_cache = json.load(f)
-            else:
-                geo_cache = {}
-            
-            
-            modalites_indesirables = [
-                    "Pas precise", "Pas précisé", "Pas precise", "Pas précise","Non précisé","non précisé",
-                    " RAS", "Ras", "R A S ", "ras", "r a s"," ","nan",
-                    " Pas mentionné", "Pasmentionné", "Pas mentionne"
-                ]
-            # 4️⃣ Fonction pour obtenir les coordonnées avec cache
-            def get_coordinates_with_cache(row):
-                query = f"{row['Quartier']}, {row['Arrondissement']}, Douala, Cameroun"
-            
-                # Vérifier si l'adresse est déjà dans le cache
-                if query in geo_cache:
-                    return pd.Series(geo_cache[query])
-            
-                # Vérifier si les données sont valides avant d'envoyer la requête
-                if pd.isna(row["Quartier"]) or pd.isna(row["Arrondissement"]) or row["Quartier"] in modalites_indesirables :
-                    return pd.Series({'latitude': 4.0483, 'longitude': 9.7043})  # Coordonnées par défaut de Douala
-            
-                try:
-                    location = geocode(query)
-                    if location:
-                        geo_cache[query] = {'latitude': location.latitude, 'longitude': location.longitude}
-                    else:
-                        geo_cache[query] = {'latitude': 4.0483, 'longitude': 9.7043}  # Valeur par défaut
-                except Exception as e:
-                    print(f"⚠️ Erreur pour {query}: {e}")
-                    geo_cache[query] = {'latitude': 4.0483, 'longitude': 9.7043}  # Valeur par défaut
-            
+        # 2️⃣ Initialisation du Géocodeur avec timeout
+        geolocator = Nominatim(user_agent="blood_donation_cameroon", timeout=10)
+        geocode = RateLimiter(geolocator.geocode, min_delay_seconds=2, max_retries=3)
+        
+        # 3️⃣ Charger le cache si existant
+        cache_file = "geo_cache.json"
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                geo_cache = json.load(f)
+        else:
+            geo_cache = {}
+        
+        
+        modalites_indesirables = [
+                "Pas precise", "Pas précisé", "Pas precise", "Pas précise","Non précisé","non précisé",
+                " RAS", "Ras", "R A S ", "ras", "r a s"," ","nan",
+                " Pas mentionné", "Pasmentionné", "Pas mentionne"
+            ]
+        # 4️⃣ Fonction pour obtenir les coordonnées avec cache
+        def get_coordinates_with_cache(row):
+            query = f"{row['Quartier']}, {row['Arrondissement']}, Douala, Cameroun"
+        
+            # Vérifier si l'adresse est déjà dans le cache
+            if query in geo_cache:
                 return pd.Series(geo_cache[query])
+        
+            # Vérifier si les données sont valides avant d'envoyer la requête
+            if pd.isna(row["Quartier"]) or pd.isna(row["Arrondissement"]) or row["Quartier"] in modalites_indesirables :
+                return pd.Series({'latitude': 4.0483, 'longitude': 9.7043})  # Coordonnées par défaut de Douala
+        
+            try:
+                location = geocode(query)
+                if location:
+                    geo_cache[query] = {'latitude': location.latitude, 'longitude': location.longitude}
+                else:
+                    geo_cache[query] = {'latitude': 4.0483, 'longitude': 9.7043}  # Valeur par défaut
+            except Exception as e:
+                print(f"⚠️ Erreur pour {query}: {e}")
+                geo_cache[query] = {'latitude': 4.0483, 'longitude': 9.7043}  # Valeur par défaut
+        
+            return pd.Series(geo_cache[query])
+        
+        # 5️⃣ Vérification et exécution du géocodage uniquement si nécessaire
+        if "latitude" in df_carte.columns and "longitude" in df_carte.columns:
+            print("📌 Coordonnées déjà présentes dans le fichier. Géocodage non nécessaire.")
+        else:
+            print("📌 Démarrage du géocodage avec cache...")
+            tqdm.pandas()  # Activation de la barre de progression
+            coordinates = df_carte.progress_apply(get_coordinates_with_cache, axis=1)
+        
+            # Fusionner les nouvelles coordonnées avec les données existantes
+            df_carte = pd.concat([df_carte, coordinates], axis=1)
+        
+            # Sauvegarder les résultats pour éviter de refaire le géocodage
+            with open(cache_file, "w") as f:
+                json.dump(geo_cache, f)
+            print("✅ Géocodage terminé et sauvegardé !")
+        
+        # 6️⃣ Création de la carte Folium
+        m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles='cartodb dark_matter')
+        
+        # 7️⃣ Ajout des marqueurs pour chaque donneur
+        for idx, row in df_carte.iterrows():
+            popup_content = f"""
+            <b>{row['Genre']}, {row['Age']} ans</b><br>
+            <i>{row['Profession']}</i><br>
+            Éligible: {row.get('Eligibilite_Don', 'N/A')}<br>
+            Quartier: {row['Quartier']}
+            """
+            folium.Marker(
+                location=[row['latitude'], row['longitude']],
+                popup=folium.Popup(popup_content, max_width=250),
+                icon=folium.Icon(
+                    color='green' if row.get('Eligibilite_Don') == 'Oui' else 'red',
+                    icon='tint',
+                    prefix='fa'
+                )
+            ).add_to(m)
+
+        # Ajouter une couche de chaleur pour visualiser la densité
+        location=[row['latitude'], row['longitude']]
+        # Avec pondération (par exemple, selon le nombre de dons)
+        heat_data_weighted = []
+        for idx, row in df_carte.iterrows():
+            if not pd.isna(row['latitude']) and not pd.isna(row['longitude']):
+                # Ajouter un poids (par exemple, nombre de dons)
+                weight = row.get('Nombre_Dons', 1)  # Utiliser 1 comme valeur par défaut
+                heat_data_weighted.append([row['latitude'], row['longitude'], weight])
+        
+        # Ajouter la couche de chaleur pondérée
+        HeatMap(heat_data_weighted, radius=15, blur=10).add_to(m)
+
+        from folium.plugins import MarkerCluster
+        from folium import Choropleth, GeoJson
+        
+        # Supposons que vous avez un fichier GeoJSON avec les limites des quartiers
+        # et un DataFrame avec le nombre de dons par quartier
+        
+        # 1. Charger le GeoJSON des quartiers
+        def create_quartier_choropleth(df):
+            # Créer une carte centrée sur Douala
+            #m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles='CartoDB positron')
+            m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles=None)
+        
+            # Ajouter une couche blanche personnalisée
+            folium.raster_layers.TileLayer(
+                tiles='',
+                attr='',
+                name='fond blanc',
+                overlay=False,
+                control=True,
+                opacity=1.0,
+                styles=[('background-color', '#ffffff')]
+            ).add_to(m)
+        
             
-            # 5️⃣ Vérification et exécution du géocodage uniquement si nécessaire
-            if "latitude" in df_carte.columns and "longitude" in df_carte.columns:
-                print("📌 Coordonnées déjà présentes dans le fichier. Géocodage non nécessaire.")
-            else:
-                print("📌 Démarrage du géocodage avec cache...")
-                tqdm.pandas()  # Activation de la barre de progression
-                coordinates = df_carte.progress_apply(get_coordinates_with_cache, axis=1)
+            # Compter le nombre de dons par quartier
+            quartier_counts = df['Quartier'].value_counts().reset_index()
+            quartier_counts.columns = ['Quartier', 'Nombre_Dons']
             
-                # Fusionner les nouvelles coordonnées avec les données existantes
-                df_carte = pd.concat([df_carte, coordinates], axis=1)
+            # Créer un dictionnaire pour le style de chaque quartier
+            quartier_data = quartier_counts.set_index('Quartier')['Nombre_Dons'].to_dict()
             
-                # Sauvegarder les résultats pour éviter de refaire le géocodage
-                with open(cache_file, "w") as f:
-                    json.dump(geo_cache, f)
-                print("✅ Géocodage terminé et sauvegardé !")
-            
-            # 6️⃣ Création de la carte Folium
-            m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles='cartodb dark_matter')
-            
-            # 7️⃣ Ajout des marqueurs pour chaque donneur
-            for idx, row in df_carte.iterrows():
-                popup_content = f"""
-                <b>{row['Genre']}, {row['Age']} ans</b><br>
-                <i>{row['Profession']}</i><br>
-                Éligible: {row.get('Eligibilite_Don', 'N/A')}<br>
-                Quartier: {row['Quartier']}
-                """
-                folium.Marker(
-                    location=[row['latitude'], row['longitude']],
-                    popup=folium.Popup(popup_content, max_width=250),
-                    icon=folium.Icon(
-                        color='green' if row.get('Eligibilite_Don') == 'Oui' else 'red',
-                        icon='tint',
-                        prefix='fa'
+            # Charger le GeoJSON des quartiers (vous devez créer ou obtenir ce fichier)
+            try:
+                with open('data/quartiers_douala.geojson', 'r') as f:
+                    quartiers_geo = json.load(f)
+                    
+                # Créer la couche Choropleth
+                Choropleth(
+                    geo_data=quartiers_geo,
+                    name='Densité de dons par quartier',
+                    data=quartier_counts,
+                    columns=['Quartier', 'Nombre_Dons'],
+                    key_on='feature.properties.name',  # Doit correspondre à la propriété dans le GeoJSON
+                    fill_color='YlOrRd',
+                    fill_opacity=0.7,
+                    line_opacity=0.2,
+                    legend_name='Nombre de dons',
+                    highlight=True,
+                    tooltip=folium.features.GeoJsonTooltip(
+                        fields=['name', 'Nombre_Dons'],
+                        aliases=['Quartier: ', 'Nombre de dons: '],
+                        localize=True
                     )
                 ).add_to(m)
-    
-            # Ajouter une couche de chaleur pour visualiser la densité
-            location=[row['latitude'], row['longitude']]
-            # Avec pondération (par exemple, selon le nombre de dons)
-            heat_data_weighted = []
-            for idx, row in df_carte.iterrows():
-                if not pd.isna(row['latitude']) and not pd.isna(row['longitude']):
-                    # Ajouter un poids (par exemple, nombre de dons)
-                    weight = row.get('Nombre_Dons', 1)  # Utiliser 1 comme valeur par défaut
-                    heat_data_weighted.append([row['latitude'], row['longitude'], weight])
-            
-            # Ajouter la couche de chaleur pondérée
-            HeatMap(heat_data_weighted, radius=15, blur=10).add_to(m)
-    
-            from folium.plugins import MarkerCluster
-            from folium import Choropleth, GeoJson
-            
-            # Supposons que vous avez un fichier GeoJSON avec les limites des quartiers
-            # et un DataFrame avec le nombre de dons par quartier
-            
-            # 1. Charger le GeoJSON des quartiers
-            def create_quartier_choropleth(df):
-                # Créer une carte centrée sur Douala
-                #m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles='CartoDB positron')
-                m = folium.Map(location=[4.0483, 9.7043], zoom_start=12, tiles=None)
-            
-                # Ajouter une couche blanche personnalisée
-                folium.raster_layers.TileLayer(
-                    tiles='',
-                    attr='',
-                    name='fond blanc',
-                    overlay=False,
-                    control=True,
-                    opacity=1.0,
-                    styles=[('background-color', '#ffffff')]
-                ).add_to(m)
-            
                 
-                # Compter le nombre de dons par quartier
-                quartier_counts = df['Quartier'].value_counts().reset_index()
-                quartier_counts.columns = ['Quartier', 'Nombre_Dons']
+                # Ajouter un contrôle de couches
+                folium.LayerControl().add_to(m)
                 
-                # Créer un dictionnaire pour le style de chaque quartier
-                quartier_data = quartier_counts.set_index('Quartier')['Nombre_Dons'].to_dict()
+            except FileNotFoundError:
+                # Si le fichier GeoJSON n'existe pas, créer une alternative
+                st.warning("Fichier GeoJSON des quartiers non trouvé. Création d'une visualisation alternative.")
                 
-                # Charger le GeoJSON des quartiers (vous devez créer ou obtenir ce fichier)
-                try:
-                    with open('data/quartiers_douala.geojson', 'r') as f:
-                        quartiers_geo = json.load(f)
+                # Alternative: utiliser des cercles proportionnels
+                for quartier, count in quartier_data.items():
+                    # Obtenir les coordonnées du quartier depuis le fichier JSON
+                    geo_data = load_geo_coordinates()
+                    if "Quartier" in geo_data and quartier in geo_data["Quartier"]:
+                        coords = geo_data["Quartier"][quartier]
                         
-                    # Créer la couche Choropleth
-                    Choropleth(
-                        geo_data=quartiers_geo,
-                        name='Densité de dons par quartier',
-                        data=quartier_counts,
-                        columns=['Quartier', 'Nombre_Dons'],
-                        key_on='feature.properties.name',  # Doit correspondre à la propriété dans le GeoJSON
-                        fill_color='YlOrRd',
-                        fill_opacity=0.7,
-                        line_opacity=0.2,
-                        legend_name='Nombre de dons',
-                        highlight=True,
-                        tooltip=folium.features.GeoJsonTooltip(
-                            fields=['name', 'Nombre_Dons'],
-                            aliases=['Quartier: ', 'Nombre de dons: '],
-                            localize=True
+                        # Créer un cercle dont la taille dépend du nombre de dons
+                        folium.Circle(
+                            location=coords,
+                            radius=count * 20,  # Rayon proportionnel au nombre de dons
+                            color='red',
+                            fill=True,
+                            fill_color='red',
+                            fill_opacity=0.6,
+                            tooltip=f"Quartier: {quartier}<br>Nombre de dons: {count}"
+                        ).add_to(m)
+            
+        
+               
+                
+        # 8️⃣ Affichage de la carte
+      
+        folium_static(m)
+
+    
+    elif page == "Santé et éligibilité":
+        st.header("🩺 Conditions de santé et éligibilité au don")   
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
+        if dataset == "2019":
+            analyze_categorical_relationships(df_2019, "Données 2019")
+        elif dataset == "2020":
+            analyze_categorical_relationships(df_2020, "Données 2020")
+        else :
+            analyze_categorical_relationships(df_volontaire, "Données volontaire")
+
+    # Charger les données
+    df_2019, df_2020, df_volontaire =load_data() 
+    
+    if page == "Profils des donneurs":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Profil_donneur.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        st.header("👥 Profils des donneurs")
+        
+        # Effectuer le clustering des donneurs
+        cluster_fig, cluster_stats, df_with_clusters = create_donor_clustering(df)
+        
+        if cluster_fig is not None:
+            # Afficher la visualisation des clusters
+            st.subheader("Clustering des donneurs")
+            st.plotly_chart(cluster_fig, use_container_width=True)
+            
+            # Afficher les caractéristiques des clusters
+            st.subheader("Caractéristiques des clusters")
+            st.dataframe(cluster_stats)
+            
+            # Créer des profils de donneurs idéaux
+            st.subheader("Profils de donneurs idéaux")
+            
+            # Identifier le cluster avec le plus grand nombre de donneurs éligibles
+            if 'ÉLIGIBILITÉ_AU_DON.' in df_with_clusters.columns and 'Cluster' in df_with_clusters.columns:
+                # Compter le nombre de donneurs éligibles par cluster
+                eligible_counts = df_with_clusters[df_with_clusters['ÉLIGIBILITÉ_AU_DON.'] == 'Eligible'].groupby('Cluster').size()
+                
+                if not eligible_counts.empty:
+                    ideal_cluster = eligible_counts.idxmax()
+                    
+                    st.write(f"**Cluster idéal identifié: Cluster {ideal_cluster}**")
+                    
+                    # Extraire les caractéristiques du cluster idéal
+                    ideal_profile = df_with_clusters[df_with_clusters['Cluster'] == ideal_cluster]
+                    
+                    # Afficher les caractéristiques démographiques du cluster idéal
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write("**Caractéristiques démographiques:**")
+                        
+                        if 'Age' in ideal_profile.columns:
+                            st.write(f"- Âge moyen: {ideal_profile['Age'].mean():.1f} ans")
+                        
+                        if 'Genre_' in ideal_profile.columns:
+                            gender_pct = ideal_profile['Genre_'].value_counts(normalize=True) * 100
+                            st.write(f"- Genre: {gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes")
+                        
+                        if 'Niveau_d\'etude' in ideal_profile.columns:
+                            top_edu = ideal_profile['Niveau_d\'etude'].value_counts(normalize=True).head(2)
+                            st.write("- Niveau d'études principal:")
+                            for edu, pct in top_edu.items():
+                                st.write(f"  • {edu}: {pct*100:.1f}%")
+                        
+                        if 'Situation_Matrimoniale_(SM)' in ideal_profile.columns:
+                            top_marital = ideal_profile['Situation_Matrimoniale_(SM)'].value_counts(normalize=True).head(2)
+                            st.write("- Situation matrimoniale principale:")
+                            for status, pct in top_marital.items():
+                                st.write(f"  • {status}: {pct*100:.1f}%")
+                    
+                    with col2:
+                        st.write("**Caractéristiques géographiques:**")
+                        
+                        geo_columns = [col for col in ideal_profile.columns if any(term in col for term in 
+                                      ['Arrondissement', 'Quartier', 'Résidence'])]
+                        
+                        for geo_col in geo_columns:
+                            top_geo = ideal_profile[geo_col].value_counts(normalize=True).head(3)
+                            st.write(f"- {geo_col} principal:")
+                            for zone, pct in top_geo.items():
+                                st.write(f"  • {zone}: {pct*100:.1f}%")
+                    
+                    # Créer un radar chart pour visualiser le profil idéal
+                    if 'Age' in ideal_profile.columns and 'Taille_' in ideal_profile.columns and 'Poids' in ideal_profile.columns:
+                        # Calculer les moyennes normalisées
+                        avg_age = ideal_profile['Age'].mean() / df['Age'].max()
+                        avg_height = ideal_profile['Taille_'].mean() / df['Taille_'].max()
+                        avg_weight = ideal_profile['Poids'].mean() / df['Poids'].max()
+                        
+                        # Créer un radar chart
+                        categories = ['Âge', 'Taille', 'Poids']
+                        values = [avg_age, avg_height, avg_weight]
+                        
+                        fig = go.Figure()
+                        
+                        fig.add_trace(go.Scatterpolar(
+                            r=values,
+                            theta=categories,
+                            fill='toself',
+                            name='Profil idéal'
+                        ))
+                        
+                        fig.update_layout(
+                            polar=dict(
+                                radialaxis=dict(
+                                    visible=True,
+                                    range=[0, 1]
+                                )
+                            ),
+                            title="Caractéristiques physiques du profil idéal (normalisées)",
+                            height=400
                         )
-                    ).add_to(m)
-                    
-                    # Ajouter un contrôle de couches
-                    folium.LayerControl().add_to(m)
-                    
-                except FileNotFoundError:
-                    # Si le fichier GeoJSON n'existe pas, créer une alternative
-                    st.warning("Fichier GeoJSON des quartiers non trouvé. Création d'une visualisation alternative.")
-                    
-                    # Alternative: utiliser des cercles proportionnels
-                    for quartier, count in quartier_data.items():
-                        # Obtenir les coordonnées du quartier depuis le fichier JSON
-                        geo_data = load_geo_coordinates()
-                        if "Quartier" in geo_data and quartier in geo_data["Quartier"]:
-                            coords = geo_data["Quartier"][quartier]
-                            
-                            # Créer un cercle dont la taille dépend du nombre de dons
-                            folium.Circle(
-                                location=coords,
-                                radius=count * 20,  # Rayon proportionnel au nombre de dons
-                                color='red',
-                                fill=True,
-                                fill_color='red',
-                                fill_opacity=0.6,
-                                tooltip=f"Quartier: {quartier}<br>Nombre de dons: {count}"
-                            ).add_to(m)
-                
-            
-                   
-                    
-            # 8️⃣ Affichage de la carte
-          
-            folium_static(m)
-    
-        
-        elif page == "Santé et éligibilité":
-            st.header("🩺 Conditions de santé et éligibilité au don")   
-            data_2019_path ="data_2019_pretraite.csv"
-            data_2020_path = "data_2020_pretraite.csv"
-            data_volontaire_path = "data_Volontaire_pretraite.csv"
-        
-            df_2019 = pd.read_csv(data_2019_path)
-            df_2020 = pd.read_csv(data_2020_path)
-            df_volontaire = pd.read_csv(data_volontaire_path)
-            if dataset == "2019":
-                analyze_categorical_relationships(df_2019, "Données 2019")
-            elif dataset == "2020":
-                analyze_categorical_relationships(df_2020, "Données 2020")
-            else :
-                analyze_categorical_relationships(df_volontaire, "Données volontaire")
-    
-        # Charger les données
-        df_2019, df_2020, df_volontaire =load_data() 
-        
-        if page == "Profils des donneurs":
-            # Afficher l'image en haut, sur toute la largeur
-            image_file="Profil_donneur.jpg"
-            image = Image.open(image_file)
-            st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
-            st.header("👥 Profils des donneurs")
-            
-            # Effectuer le clustering des donneurs
-            cluster_fig, cluster_stats, df_with_clusters = create_donor_clustering(df)
-            
-            if cluster_fig is not None:
-                # Afficher la visualisation des clusters
-                st.subheader("Clustering des donneurs")
-                st.plotly_chart(cluster_fig, use_container_width=True)
-                
-                # Afficher les caractéristiques des clusters
-                st.subheader("Caractéristiques des clusters")
-                st.dataframe(cluster_stats)
-                
-                # Créer des profils de donneurs idéaux
-                st.subheader("Profils de donneurs idéaux")
-                
-                # Identifier le cluster avec le plus grand nombre de donneurs éligibles
-                if 'ÉLIGIBILITÉ_AU_DON.' in df_with_clusters.columns and 'Cluster' in df_with_clusters.columns:
-                    # Compter le nombre de donneurs éligibles par cluster
-                    eligible_counts = df_with_clusters[df_with_clusters['ÉLIGIBILITÉ_AU_DON.'] == 'Eligible'].groupby('Cluster').size()
-                    
-                    if not eligible_counts.empty:
-                        ideal_cluster = eligible_counts.idxmax()
                         
-                        st.write(f"**Cluster idéal identifié: Cluster {ideal_cluster}**")
-                        
-                        # Extraire les caractéristiques du cluster idéal
-                        ideal_profile = df_with_clusters[df_with_clusters['Cluster'] == ideal_cluster]
-                        
-                        # Afficher les caractéristiques démographiques du cluster idéal
-                        col1, col2 = st.columns(2)
-                        
-                        with col1:
-                            st.write("**Caractéristiques démographiques:**")
-                            
-                            if 'Age' in ideal_profile.columns:
-                                st.write(f"- Âge moyen: {ideal_profile['Age'].mean():.1f} ans")
-                            
-                            if 'Genre_' in ideal_profile.columns:
-                                gender_pct = ideal_profile['Genre_'].value_counts(normalize=True) * 100
-                                st.write(f"- Genre: {gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes")
-                            
-                            if 'Niveau_d\'etude' in ideal_profile.columns:
-                                top_edu = ideal_profile['Niveau_d\'etude'].value_counts(normalize=True).head(2)
-                                st.write("- Niveau d'études principal:")
-                                for edu, pct in top_edu.items():
-                                    st.write(f"  • {edu}: {pct*100:.1f}%")
-                            
-                            if 'Situation_Matrimoniale_(SM)' in ideal_profile.columns:
-                                top_marital = ideal_profile['Situation_Matrimoniale_(SM)'].value_counts(normalize=True).head(2)
-                                st.write("- Situation matrimoniale principale:")
-                                for status, pct in top_marital.items():
-                                    st.write(f"  • {status}: {pct*100:.1f}%")
-                        
-                        with col2:
-                            st.write("**Caractéristiques géographiques:**")
-                            
-                            geo_columns = [col for col in ideal_profile.columns if any(term in col for term in 
-                                          ['Arrondissement', 'Quartier', 'Résidence'])]
-                            
-                            for geo_col in geo_columns:
-                                top_geo = ideal_profile[geo_col].value_counts(normalize=True).head(3)
-                                st.write(f"- {geo_col} principal:")
-                                for zone, pct in top_geo.items():
-                                    st.write(f"  • {zone}: {pct*100:.1f}%")
-                        
-                        # Créer un radar chart pour visualiser le profil idéal
-                        if 'Age' in ideal_profile.columns and 'Taille_' in ideal_profile.columns and 'Poids' in ideal_profile.columns:
-                            # Calculer les moyennes normalisées
-                            avg_age = ideal_profile['Age'].mean() / df['Age'].max()
-                            avg_height = ideal_profile['Taille_'].mean() / df['Taille_'].max()
-                            avg_weight = ideal_profile['Poids'].mean() / df['Poids'].max()
-                            
-                            # Créer un radar chart
-                            categories = ['Âge', 'Taille', 'Poids']
-                            values = [avg_age, avg_height, avg_weight]
-                            
-                            fig = go.Figure()
-                            
-                            fig.add_trace(go.Scatterpolar(
-                                r=values,
-                                theta=categories,
-                                fill='toself',
-                                name='Profil idéal'
-                            ))
-                            
-                            fig.update_layout(
-                                polar=dict(
-                                    radialaxis=dict(
-                                        visible=True,
-                                        range=[0, 1]
-                                    )
-                                ),
-                                title="Caractéristiques physiques du profil idéal (normalisées)",
-                                height=400
-                            )
-                            
-                            st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("Impossible de déterminer le profil idéal car la colonne d'éligibilité n'est pas disponible.")
-            else:
-                st.warning("Impossible d'effectuer le clustering car il n'y a pas assez de variables numériques dans les données.")
-        
-        elif page == "Analyse des campagnes":
-            st.header("📈 Analyse des campagnes de don")
-            
-            # Créer des visualisations pour l'analyse des campagnes
-            campaign_fig, demographic_figs = create_campaign_analysis(df)
-            
-            if campaign_fig is not None:
-                # Afficher la tendance temporelle générale
-                st.subheader("Évolution du nombre de donneurs au fil du temps")
-                st.plotly_chart(campaign_fig, use_container_width=True)
-                
-                # Afficher les tendances par caractéristiques démographiques
-                if demographic_figs:
-                    st.subheader("Tendances par caractéristiques démographiques")
-                    
-                    for fig in demographic_figs:
                         st.plotly_chart(fig, use_container_width=True)
-                
-                # Ajouter des recommandations pour l'optimisation des campagnes
-                st.subheader("Recommandations pour l'optimisation des campagnes")
-                
-                st.write("""
-                Sur la base de l'analyse des données, voici quelques recommandations pour optimiser les futures campagnes de don de sang:
-                
-                1. **Ciblage démographique**: Concentrez les efforts sur les segments de population les plus susceptibles de donner, comme identifié dans l'analyse des profils.
-                
-                2. **Planification temporelle**: Organisez les campagnes pendant les périodes où le taux de participation est historiquement élevé.
-                
-                3. **Localisation géographique**: Privilégiez les zones géographiques avec un taux d'éligibilité élevé et une forte concentration de donneurs potentiels.
-                
-                4. **Sensibilisation ciblée**: Développez des messages spécifiques pour les groupes sous-représentés afin d'augmenter leur participation.
-                
-                5. **Fidélisation**: Mettez en place des stratégies pour encourager les donneurs à revenir régulièrement.
-                """)
             else:
-                st.warning("Impossible d'analyser les tendances temporelles car aucune colonne de date appropriée n'a été identifiée.")
-        
-        elif page == "Fidélisation des donneurs":
-            # Afficher l'image en haut, sur toute la largeur
-            image_file="Fidélisation.jpg"
-            image = Image.open(image_file)
-            st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
-            st.header("🔄 Fidélisation des donneurs")
-            
-            # Créer des visualisations pour l'analyse de fidélisation
-            retention_fig, demographic_figs = create_donor_retention_analysis(df)
-            
-            if retention_fig is not None:
-                # Afficher la proportion de donneurs fidélisés
-                st.subheader("Proportion de donneurs fidélisés")
-                st.plotly_chart(retention_fig, use_container_width=True)
-                
-                # Afficher la fidélisation par caractéristiques démographiques
-                if demographic_figs:
-                    st.subheader("Fidélisation par caractéristiques démographiques")
-                    
-                    for fig in demographic_figs:
-                        st.plotly_chart(fig, use_container_width=True)
-                
-                # Ajouter des stratégies pour améliorer la fidélisation
-                st.subheader("Stratégies pour améliorer la fidélisation des donneurs")
-                
-                st.write("""
-                Voici quelques stratégies pour améliorer la fidélisation des donneurs de sang:
-                
-                1. **Programme de reconnaissance**: Mettre en place un système de reconnaissance pour les donneurs réguliers (badges, certificats, etc.).
-                
-                2. **Communication personnalisée**: Envoyer des rappels personnalisés aux donneurs en fonction de leur historique de don.
-                
-                3. **Expérience positive**: Améliorer l'expérience du donneur pendant le processus de don pour encourager le retour.
-                
-                4. **Éducation continue**: Informer les donneurs sur l'impact de leur don et l'importance de donner régulièrement.
-                
-                5. **Événements communautaires**: Organiser des événements spéciaux pour les donneurs réguliers afin de renforcer leur engagement.
-                """)
-            else:
-                st.warning("Impossible d'analyser la fidélisation car les informations nécessaires ne sont pas disponibles dans les données.")
-        
-        elif page == "Analyse de sentiment":
-            # Afficher l'image en haut, sur toute la largeur
-            image_file="Analyse_sentiment.jpg"
-            image = Image.open(image_file)
-            st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
-            st.header("🩺 Conditions de santé et éligibilité au don")   
-            data_2019_path ="data_2019_pretraite.csv"
-            data_2020_path = "data_2020_pretraite.csv"
-            data_volontaire_path = "data_Volontaire_pretraite.csv"
-        
-            df_2019 = pd.read_csv(data_2019_path)
-            df_2020 = pd.read_csv(data_2020_path)
-            df_volontaire = pd.read_csv(data_volontaire_path)
-            
-            st.header("💬 Analyse de sentiment des retours")
-            nltk.download("vader_lexicon")
-            sia = SentimentIntensityAnalyzer()
-            
-            if "Si_autres_raison_préciser_" in df_volontaires.columns:
-                df_volontaires["Sentiment"] = df_volontaires["Si_autres_raison_préciser_"].dropna().apply(lambda x: sia.polarity_scores(str(x))["compound"])
-                text = " ".join(str(f) for f in df_volontaires["Si_autres_raison_préciser_"].dropna())
-                wordcloud = WordCloud(width=800, height=400, background_color="white").generate(text)
-                st.image(wordcloud.to_array(), caption="Nuage de Mots des Feedbacks", use_column_width=True)
-            if dataset == "2019":
-                create_sentiment_analysis(df_2019)
-            if dataset == "Volontaire":
-                create_sentiment_analysis(df_volontaire)
-            
-        elif page == "Bonus" :
-            st.markdown("### 🔍 Bonus - Exploration Interactive avec Pygwalker")
-        
-            # Section Pygwalker selon le dataset choisi
-            if dataset == "2019":
-                df_selected = df_2019
-            elif dataset == "2020":
-                df_selected = df_2020
-            else:
-                df_selected = df_volontaire
-        
-            with st.expander("🎯 Analyse interactive du dataset sélectionné"):
-                #pyg_html = pyg.walk(df_selected, output_type='html')
-                #components.html(pyg_html, height=500, scrolling=True)
-                pyg_app=StreamlitRenderer(df_selected)
-                pyg_app.explorer()
-        
-            # Upload CSV ou Excel
-            st.markdown("---")
-            st.markdown("### 📂 Importer ton propre fichier")
-        
-            uploaded_file = st.file_uploader("Choisis un fichier CSV ou Excel", type=["csv", "xlsx"])
-        
-            if uploaded_file is not None:
-                if uploaded_file.name.endswith(".csv"):
-                    data = pd.read_csv(uploaded_file)
-                elif uploaded_file.name.endswith(".xlsx"):
-                    data = pd.read_excel(uploaded_file)
-                else:
-                    st.warning("Format non supporté.")
-                    data = None
-        
-                if data is not None:
-                    st.success("✅ Fichier chargé avec succès !")
-                    with st.expander("📊 Analyse interactive de ton fichier importé"):
-                        #pyg_html = pyg.walk(data, output_type='html')
-                        #components.html(pyg_html, height=500, scrolling=True)
-                        pyg_app=StreamlitRenderer(data)
-                        pyg_app.explorer()
+                st.info("Impossible de déterminer le profil idéal car la colonne d'éligibilité n'est pas disponible.")
+        else:
+            st.warning("Impossible d'effectuer le clustering car il n'y a pas assez de variables numériques dans les données.")
     
+    elif page == "Analyse des campagnes":
+        st.header("📈 Analyse des campagnes de don")
+        
+        # Créer des visualisations pour l'analyse des campagnes
+        campaign_fig, demographic_figs = create_campaign_analysis(df)
+        
+        if campaign_fig is not None:
+            # Afficher la tendance temporelle générale
+            st.subheader("Évolution du nombre de donneurs au fil du temps")
+            st.plotly_chart(campaign_fig, use_container_width=True)
             
-        elif page == "Prédiction d'éligibilité":
-            st.header("🔮 Prédiction d'éligibilité au don")
+            # Afficher les tendances par caractéristiques démographiques
+            if demographic_figs:
+                st.subheader("Tendances par caractéristiques démographiques")
+                
+                for fig in demographic_figs:
+                    st.plotly_chart(fig, use_container_width=True)
             
-            st.title("🔍 Prédiction d'Éligibilité au Don de Sang")
+            # Ajouter des recommandations pour l'optimisation des campagnes
+            st.subheader("Recommandations pour l'optimisation des campagnes")
+            
+            st.write("""
+            Sur la base de l'analyse des données, voici quelques recommandations pour optimiser les futures campagnes de don de sang:
+            
+            1. **Ciblage démographique**: Concentrez les efforts sur les segments de population les plus susceptibles de donner, comme identifié dans l'analyse des profils.
+            
+            2. **Planification temporelle**: Organisez les campagnes pendant les périodes où le taux de participation est historiquement élevé.
+            
+            3. **Localisation géographique**: Privilégiez les zones géographiques avec un taux d'éligibilité élevé et une forte concentration de donneurs potentiels.
+            
+            4. **Sensibilisation ciblée**: Développez des messages spécifiques pour les groupes sous-représentés afin d'augmenter leur participation.
+            
+            5. **Fidélisation**: Mettez en place des stratégies pour encourager les donneurs à revenir régulièrement.
+            """)
+        else:
+            st.warning("Impossible d'analyser les tendances temporelles car aucune colonne de date appropriée n'a été identifiée.")
+    
+    elif page == "Fidélisation des donneurs":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Fidélisation.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        st.header("🔄 Fidélisation des donneurs")
+        
+        # Créer des visualisations pour l'analyse de fidélisation
+        retention_fig, demographic_figs = create_donor_retention_analysis(df)
+        
+        if retention_fig is not None:
+            # Afficher la proportion de donneurs fidélisés
+            st.subheader("Proportion de donneurs fidélisés")
+            st.plotly_chart(retention_fig, use_container_width=True)
+            
+            # Afficher la fidélisation par caractéristiques démographiques
+            if demographic_figs:
+                st.subheader("Fidélisation par caractéristiques démographiques")
+                
+                for fig in demographic_figs:
+                    st.plotly_chart(fig, use_container_width=True)
+            
+            # Ajouter des stratégies pour améliorer la fidélisation
+            st.subheader("Stratégies pour améliorer la fidélisation des donneurs")
+            
+            st.write("""
+            Voici quelques stratégies pour améliorer la fidélisation des donneurs de sang:
+            
+            1. **Programme de reconnaissance**: Mettre en place un système de reconnaissance pour les donneurs réguliers (badges, certificats, etc.).
+            
+            2. **Communication personnalisée**: Envoyer des rappels personnalisés aux donneurs en fonction de leur historique de don.
+            
+            3. **Expérience positive**: Améliorer l'expérience du donneur pendant le processus de don pour encourager le retour.
+            
+            4. **Éducation continue**: Informer les donneurs sur l'impact de leur don et l'importance de donner régulièrement.
+            
+            5. **Événements communautaires**: Organiser des événements spéciaux pour les donneurs réguliers afin de renforcer leur engagement.
+            """)
+        else:
+            st.warning("Impossible d'analyser la fidélisation car les informations nécessaires ne sont pas disponibles dans les données.")
+    
+    elif page == "Analyse de sentiment":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Analyse_sentiment.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        st.header("🩺 Conditions de santé et éligibilité au don")   
+        data_2019_path ="data_2019_pretraite.csv"
+        data_2020_path = "data_2020_pretraite.csv"
+        data_volontaire_path = "data_Volontaire_pretraite.csv"
+    
+        df_2019 = pd.read_csv(data_2019_path)
+        df_2020 = pd.read_csv(data_2020_path)
+        df_volontaire = pd.read_csv(data_volontaire_path)
+        
+        st.header("💬 Analyse de sentiment des retours")
+        nltk.download("vader_lexicon")
+        sia = SentimentIntensityAnalyzer()
+        
+        if "Si_autres_raison_préciser_" in df_volontaires.columns:
+            df_volontaires["Sentiment"] = df_volontaires["Si_autres_raison_préciser_"].dropna().apply(lambda x: sia.polarity_scores(str(x))["compound"])
+            text = " ".join(str(f) for f in df_volontaires["Si_autres_raison_préciser_"].dropna())
+            wordcloud = WordCloud(width=800, height=400, background_color="white").generate(text)
+            st.image(wordcloud.to_array(), caption="Nuage de Mots des Feedbacks", use_column_width=True)
+        if dataset == "2019":
+            create_sentiment_analysis(df_2019)
+        if dataset == "Volontaire":
+            create_sentiment_analysis(df_volontaire)
+        
+    elif page == "Bonus" :
+        st.markdown("### 🔍 Bonus - Exploration Interactive avec Pygwalker")
+    
+        # Section Pygwalker selon le dataset choisi
+        if dataset == "2019":
+            df_selected = df_2019
+        elif dataset == "2020":
+            df_selected = df_2020
+        else:
+            df_selected = df_volontaire
+    
+        with st.expander("🎯 Analyse interactive du dataset sélectionné"):
+            #pyg_html = pyg.walk(df_selected, output_type='html')
+            #components.html(pyg_html, height=500, scrolling=True)
+            pyg_app=StreamlitRenderer(df_selected)
+            pyg_app.explorer()
+    
+        # Upload CSV ou Excel
+        st.markdown("---")
+        st.markdown("### 📂 Importer ton propre fichier")
+    
+        uploaded_file = st.file_uploader("Choisis un fichier CSV ou Excel", type=["csv", "xlsx"])
+    
+        if uploaded_file is not None:
+            if uploaded_file.name.endswith(".csv"):
+                data = pd.read_csv(uploaded_file)
+            elif uploaded_file.name.endswith(".xlsx"):
+                data = pd.read_excel(uploaded_file)
+            else:
+                st.warning("Format non supporté.")
+                data = None
+    
+            if data is not None:
+                st.success("✅ Fichier chargé avec succès !")
+                with st.expander("📊 Analyse interactive de ton fichier importé"):
+                    #pyg_html = pyg.walk(data, output_type='html')
+                    #components.html(pyg_html, height=500, scrolling=True)
+                    pyg_app=StreamlitRenderer(data)
+                    pyg_app.explorer()
+
+        
+    elif page == "Prédiction d'éligibilité":
+        st.header("🔮 Prédiction d'éligibilité au don")
+        
+        st.title("🔍 Prédiction d'Éligibilité au Don de Sang")
+        # ==============================
+        # 🎯 CHARGEMENT DU MODÈLE & ENCODEURS
+        # ==============================
+        @st.cache_resource
+        def load_model():
+            pathse="eligibility_model.pkl"
+            data = joblib.load(pathse)
+            return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"],data["resultat"]
+
+        model, X_test, y_test, target_encoder, preprocessor,resultat = load_model()
+        
+
+        columns_binary = [
+                "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
+                "Hypertension", "Porteur_VIH_HBS_HCV", "Asthme",
+                "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"
+            ]
+
+
+
+        # ==============================
+        # 🗂 ORGANISATION EN ONGLETS
+        # ==============================
+        tab1, tab2,tab3= st.tabs([ "🔄 Prédiction Individuelle","📥 Télécharger/Charger un Fichier","Performance du modèle"])
+
+
+        with tab1:
+            col1,col2,col3=st.columns(3)
+            st.subheader("🔄 Faire une prédiction individuelle")
+
+            st.write("""Ce modèle prédit si un donneur est éligible ou non en fonction de ses caractéristiques médicales et personnelles.
+            Remplissez les informations ci-dessous pour obtenir une prédiction.
+        """)
+            #df=pd.read_csv(patr)
+            professions = ["Etudiant (e)", "Sans Emplois", "Tailleur", "Militaire", "Bijoutier", "Couturier","Jeune cadre", "Commerçant (e)", "Mototaximan", "Agent commercial", "Elève","Chauffeur", "COIFFEUSE", "Mécanicien", "Cultuvateur", "Fonctionnaires", "Marin", 
+    "Infirmièr", "Footballeur", "Agent de securite", "Electronicien", "Électricien", 
+    "Élève", "Sportifs", "Personnel de sante", "Formateur", "Trader indep", 
+    "Chargé de clientèle", "CONTROLEUR DES DOUANES", "ASSISTANT DE  DIRECTION", 
+    "STAGIAIRE", "Angent de securité", "Pasteur", "S1p", "Plombier", "Security officer", 
+    "BUSINESMAN", "Footballeur ", "Technicien supérieur d’agriculture", "Vigil", 
+    "Coordiste", "PEINTRE", "ADMINISTRATEUR DES HOPITAUX", "chauffeur", "Hôtelier ", 
+    "Logisticien transport", "CHAUDRONIER", "Decorateur Baptiment", "Tâcheron", 
+    "Cuisinier", "Imprimeur ", "missionnaire", "Patissier", "Docker", "Réalisateur ", 
+    "assureur", "CHAUFFEUR ", "LAVEUR", "Coach kuine", "Conducteur", "Technicien ", 
+    "Conseiller client", "Entrepreneur", "Magasinier ", "constructeur en bâtiment", 
+    "Calier", "SOUDEUR", "AGENT D'APPUI PHARMICIE", "CHAUFFEUR", "Intendant ", 
+    "conducteurs d'engins genie civil", "Chauffeur ", "Assistant transit", 
+    "Agent des ressourses humaines", "Declarant en Douane", "Menuisier", "AIDE COMPTABLE", 
+    "TECHNICIEN GENIE CIVIL", "Transitaire", "Coiffeur", "Ménagère", "VENDEUSE", 
+    "médecin", "couturière", "Pompiste", "EDUCATEUR DES ENFANTS", "Hoteliere", 
+    "OUVRIER", "Débrouillard", "MACHINISTE", "FORREUR", "CASINO", "TECHNICIEN TOPO", 
+    "COUTURIERE", "RAS", "APPRENTI TOLERIE ", "SP", "Développeur en informatique ", 
+    "Sérigraphie", "Estheticien", "Maintenancier industriel ", "Auditeur interne", 
+    "Enseignant (e)", "Agent municipal ", "Tolier", "Agent de banque", "Prestataire de service et consultant sportif", 
+    "Dolker ", "photographe", "Agent d'exploitation", "Cheminot", "ARGENT DE SÉCURITÉ ", 
+    "Secrétaire comptable", "Contractuel d'administration", "Technicien de génie civile", 
+    "Juriste", "Informaticien ", "Technicien en genie civil", "Agent administratif ", 
+    "Comptable", "Laborantin", "Ingénieur génie civil", "Analyste -programmeur", 
+    "Logisticien", "Agent de securité", "Maçon", "Menuisier ", "MENUSIER", "MENUISIER ", 
+    "Plombier", "Bijoutier", "Soudeur", "Peintre", "Chaudronnier", "Électronicien ", 
+    "Electricien", "Machiniste", "Pâtissier ", "Menuisier", "CHAUDRONNIER", 
+    "Technicien génie civil", "Agent technique", "Technicien réseaux télécoms", 
+    "Infographe", "Architecte", "Assistante", "Ménagère", "Commerçant (e)", 
+    "Employé (e)  dans une entreprise", "Agent de sécurité", "Marin", "Débrouillard", 
+    "Personnel de sante", "Comptable", "Enseignant", "Fonctionnaires", "Magasinier", 
+    "Agent commercial", "Technicien", "Informaticien", "Electricien auto", 
+    "Technicien de génie civile", "Technicien d'agriculture", "Technicien en bâtiment", 
+    "Technicien en électricité", "Technicien en mécanique", "Technicien en plomberie", 
+    "Technicien en soudure", "Technicien en informatique", "Technicien en génie civil", 
+    "Technicien en électronique", "Technicien en climatisation", "Technicien en télécoms", 
+    "Technicien en topographie", "Technicien en maintenance", "Technicien en chauffage", 
+    "Technicien en froid", "Technicien en électricité bâtiment", "Technicien en électricité industrielle", 
+    "Technicien en mécanique auto", "Technicien en mécanique industrielle", 
+    "Technicien en plomberie sanitaire", "Technicien en soudure industrielle", 
+    "Technicien en informatique bureautique", "Technicien en informatique réseau", 
+    "Technicien en informatique développement", "Technicien en génie civil bâtiment", 
+    "Technicien en génie civil travaux publics", "Technicien en électronique numérique", 
+    "Technicien en électronique analogique", "Technicien en climatisation centrale", 
+    "Technicien en télécoms réseau", "Technicien en topographie terrestre", 
+    "Technicien en maintenance industrielle", "Technicien en chauffage central", 
+    "Technicien en froid industriel", "Technicien en électricité bâtiment résidentiel", 
+    "Technicien en électricité industrielle lourde", "Technicien en mécanique automobile", 
+    "Technicien en mécanique industrielle lourde", "Technicien en plomberie sanitaire résidentielle", 
+    "Technicien en soudure industrielle lourde", "Technicien en informatique bureautique avancée", 
+    "Technicien en informatique réseau avancé", "Technicien en informatique développement avancé", 
+    "Technicien en génie civil bâtiment avancé", "Technicien en génie civil travaux publics avancés", 
+    "Technicien en électronique numérique avancée", "Technicien en électronique analogique avancée", 
+    "Technicien en climatisation centrale avancée", "Technicien en télécoms réseau avancé", 
+    "Technicien en topographie terrestre avancée", "Technicien en maintenance industrielle avancée", 
+    "Technicien en chauffage central avancé", "Technicien en froid industriel avancé", 
+    "Technicien en électricité bâtiment résidentiel avancé", "Technicien en électricité industrielle lourde avancée", 
+    "Technicien en mécanique automobile avancée", "Technicien en mécanique industrielle lourde avancée", 
+    "Technicien en plomberie sanitaire résidentielle avancée", "Technicien en soudure industrielle lourde avancée", 
+    "Technicien en informatique bureautique expert", "Technicien en informatique réseau expert", 
+    "Technicien en informatique développement expert", "Technicien en génie civil bâtiment expert", 
+    "Technicien en génie civil travaux publics expert", "Technicien en électronique numérique expert", 
+    "Technicien en électronique analogique expert", "Technicien en climatisation centrale expert", 
+    "Technicien en télécoms réseau expert", "Technicien en topographie terrestre expert", 
+    "Technicien en maintenance industrielle expert", "Technicien en chauffage central expert", 
+    "Technicien en froid industriel expert", "Technicien en électricité bâtiment résidentiel expert", 
+    "Technicien en électricité industrielle lourde expert", "Technicien en mécanique automobile expert", 
+    "Technicien en mécanique industrielle lourde expert", "Technicien en plomberie sanitaire résidentielle expert", 
+    "Technicien en soudure industrielle lourde expert"
+]
+            religions = [
+    "Chretien (Catholique)", "Musulman", "Pas Précisé", "Chretien (Protestant )", 
+    "Adventiste", "Non-croyant", "pentecôtiste", "Chretien (Ne de nouveau)", 
+    "Traditionaliste", "BAPTISTE", "pentecôtiste", "Chrétien non précisé", 
+    "pentecotiste", "Chretien (Protestant)", "Musulmane"
+]
+            niveaux_etude = [
+    "Universitaire", "Aucun", "Secondaire", "Primaire", "Pas Précisé"
+]
+            statuts_matrimoniaux = [
+    "Célibataire", "Marié (e)", "veuf (veuve)", "Divorcé(e)"
+]
             # ==============================
-            # 🎯 CHARGEMENT DU MODÈLE & ENCODEURS
+            # 📌 FORMULAIRE DE SAISIE
+            # ==============================
+            with col1:
+                age = st.number_input("Âge", min_value=18, max_value=100, value=30, step=1)
+
+                profession = st.selectbox("Profession",list(professions) )
+                religion = st.selectbox("Religion", list(religions))
+                Niveau_Etude =st.selectbox("Niveau_Etude", list(niveaux_etude))
+                Statut_Matrimonial= st.selectbox("Statut_Matrimonial", list(statuts_matrimoniaux))
+                # État de santé (Binaire : Oui/Non)
+            columns_binary = [
+                "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
+                "Hypertension", "Porteur_VIH_HBS_HCV", "Asthme",
+                "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"
+            ]
+            columns_binarys=[
+                "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
+                "Hypertension", "Porteur_VIH_HBS_HCV"]
+            columns_binaryss=["Asthme",
+                "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"]
+            
+            with col2:
+                binary_inputs = {}
+                for col in columns_binarys:
+                    binary_inputs[col] = st.radio(col, ["Non", "Oui"])
+            with col3:
+                for col in columns_binaryss:
+                    binary_inputs[col] = st.radio(col, ["Non", "Oui"])
+
+            # ==============================
+            # 🔄 PRÉPARATION DES DONNÉES
+            # ==============================
+            # Convertir les entrées utilisateur en dataframe
+            input_data = pd.DataFrame([[age, profession] + [binary_inputs[col] for col in columns_binary]+[religion,Niveau_Etude,Statut_Matrimonial]],
+                                    columns=["Age", "Profession"] + columns_binary+["Religion","Niveau_Etude","Statut_Matrimonial"])
+
+            # Encoder Profession et Religion
+            input_data =preprocessor.transform(input_data)
+            # ==============================
+            # 🚀 PRÉDICTION
+            # ==============================
+            if st.button("Prédire l'éligibilité"):
+                prediction = model.predict(input_data)[0]
+                result = target_encoder.inverse_transform([prediction])[0]
+                 # Afficher des recommandations en fonction de la prédiction
+                st.subheader("Recommandations")
+                
+
+
+                # Affichage du résultat
+                if prediction == 1:
+                    st.success("✅ Le donneur est *ÉLIGIBLE* au don de sang !")
+                    st.balloons()
+                else:
+                    st.error("❌ Le donneur *N'EST PAS ÉLIGIBLE* au don de sang.")
+
+                # Affichage des valeurs d'entrée encodées
+                st.subheader("🔎 Données encodées utilisées pour la prédiction :")
+                #st.dataframe(input_data)
+        
+        
+        # ==============================
+        # 📥 ONGLET : TÉLÉCHARGEMENT / UPLOAD
+        # ==============================
+        with tab2:
+
+            # ==============================
+            # 📥 TÉLÉCHARGEMENT DU FICHIER MODÈLE
+            # ==============================
+            st.subheader("📥 Télécharger le modèle de fichier Excel")
+            sample_data = pd.DataFrame({
+                "Age": [30, 45],
+                "Profession": ["Médecin", "Enseignant"],
+                "Drepanocytose": ["Non", "Oui"],
+                "Opere": ["Non", "Non"],
+                "Transfusion_Antecedent": ["Oui", "Non"],
+                "Diabete": ["Non", "Oui"],
+                "Hypertension": ["Oui", "Non"],
+                "Porteur_VIH_HBS_HCV": ["Non", "Non"],
+                "Asthme": ["Non", "Oui"],
+                "Probleme_Cardiaque": ["Non", "Non"],
+                "Tatouage": ["Oui", "Non"],
+                "Scarification": ["Non", "Oui"],
+                "Deja_Donneur": ["Oui", "Non"],
+                "Religion": ["Musulman", "Chrétien"],
+                "Niveau_Etude":["Primaire","secondaire"],
+                "Statut_Matrimonial":["Marier","Celibataire"]
+            })
+
+            # Génération du fichier Excel à télécharger
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                sample_data.to_excel(writer, index=False, sheet_name="Exemple")
+                writer.close()
+
+            st.download_button(
+                label="📥 Télécharger le fichier modèle",
+                data=output.getvalue(),
+                file_name="Modele_Donneurs.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+            # ==============================
+            # 📤 UPLOADER UN FICHIER EXCEL AVEC LES DONNEURS
+            # ==============================
+            st.subheader("📤 Uploader un fichier Excel contenant les informations des donneurs")
+            uploaded_file = st.file_uploader("Téléchargez un fichier Excel", type=["xlsx"])
+
+            if uploaded_file:
+                # Lecture du fichier
+                df_uploaded = pd.read_excel(uploaded_file)
+
+                # Vérification des colonnes attendues
+                expected_columns = sample_data.columns.tolist()
+                if not all(col in df_uploaded.columns for col in expected_columns):
+                    st.error("⚠ Le fichier ne contient pas les bonnes colonnes ! Vérifiez le format et réessayez.")
+                else:
+                    st.success("✅ Fichier chargé avec succès !")
+
+                    # ==============================
+                    # 🔄 PRÉTRAITEMENT DES DONNÉES POUR TOUTES LES LIGNES
+                    # ==============================
+                    # Supprimer les lignes avec des valeurs non reconnues
+                    df_uploaded.dropna(inplace=True)
+                    colonne=["Age", "Profession", "Drepanocytose","Opere",
+                "Transfusion_Antecedent","Diabete", "Hypertension", "Porteur_VIH_HBS_HCV", 
+                "Asthme", "Probleme_Cardiaque","Tatouage","Scarification", "Deja_Donneur", "Religion","Niveau_Etude","Statut_Matrimonial"]
+                    input_data =preprocessor.transform(df_uploaded)
+                    df_uploadeds=input_data.copy()
+                    
+
+                    # Encoder les valeurs binaires (Oui = 1, Non = 0)
+                    if df_uploadeds.shape[0] == 0:
+                        st.error("Aucune donnée valide après prétraitement ! vérifiez les données d'entrée")
+
+                    # ==============================
+                    # 🚀 PRÉDICTION SUR TOUTES LES LIGNES
+                    # ==============================
+                    df_uploaded["Prédiction"] = model.predict(df_uploadeds)
+
+                    # Décodage des résultats
+                    df_uploaded["Prédiction"] = df_uploaded["Prédiction"].map(lambda x: target_encoder.inverse_transform([x])[0])
+
+                    # Affichage du tableau avec les prédictions
+                    st.subheader("📊 Résultats des prédictions")
+                    st.dataframe(df_uploaded)
+
+                    # ==============================
+                    # 📤 TÉLÉCHARGER LE FICHIER AVEC PREDICTIONS
+                    # ==============================
+                    output_predictions = io.BytesIO()
+                    with pd.ExcelWriter(output_predictions, engine='xlsxwriter') as writer:
+                        df_uploaded.to_excel(writer, index=False, sheet_name="Prédictions")
+                        writer.close()
+
+                    st.download_button(
+                        label="📥 Télécharger les résultats",
+                        data=output_predictions.getvalue(),
+                        file_name="Resultats_Predictions.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
+    # ==============================
+    # 📈 ONGLET : PERFORMANCE DU MODÈLE
+    # ==============================
+        with tab3:
+            # ==============================
+            # 🎯 CHARGEMENT DU MODÈLE & DONNÉES TEST
             # ==============================
             @st.cache_resource
             def load_model():
-                pathse="eligibility_model.pkl"
-                data = joblib.load(pathse)
-                return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"],data["resultat"]
-    
+               pathse="eligibility_model.pkl"
+               data = joblib.load(pathse)
+               return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"],data["resultat"]
+
             model, X_test, y_test, target_encoder, preprocessor,resultat = load_model()
+                # ==============================
+            # 📊 PERFORMANCE DU MODÈLE SUR DONNÉES TEST
+            # ==============================
+            st.subheader("📈 Performance du Modèle sur Données de Test")
+
+            # 🔮 Prédictions sur X_test
+            y_pred_proba = model.predict_proba(X_test)[:, 1]
+            y_pred = model.predict(X_test)
+
+            # 📄 Rapport de Classification
+            st.subheader("📄 Rapport de Classification")
+            A=target_encoder.inverse_transform([0,1,2])
+            report = classification_report(y_test, y_pred, target_names=A, output_dict=True)
+            df_report = pd.DataFrame(report).transpose()
+            st.dataframe(df_report)
+            st.dataframe(resultat)
             
-    
-            columns_binary = [
-                    "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
-                    "Hypertension", "Porteur_VIH_HBS_HCV", "Asthme",
-                    "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"
-                ]
-    
-    
-    
-            # ==============================
-            # 🗂 ORGANISATION EN ONGLETS
-            # ==============================
-            tab1, tab2,tab3= st.tabs([ "🔄 Prédiction Individuelle","📥 Télécharger/Charger un Fichier","Performance du modèle"])
-    
-    
-            with tab1:
-                col1,col2,col3=st.columns(3)
-                st.subheader("🔄 Faire une prédiction individuelle")
-    
-                st.write("""Ce modèle prédit si un donneur est éligible ou non en fonction de ses caractéristiques médicales et personnelles.
-                Remplissez les informations ci-dessous pour obtenir une prédiction.
-            """)
-                #df=pd.read_csv(patr)
-                professions = ["Etudiant (e)", "Sans Emplois", "Tailleur", "Militaire", "Bijoutier", "Couturier","Jeune cadre", "Commerçant (e)", "Mototaximan", "Agent commercial", "Elève","Chauffeur", "COIFFEUSE", "Mécanicien", "Cultuvateur", "Fonctionnaires", "Marin", 
-        "Infirmièr", "Footballeur", "Agent de securite", "Electronicien", "Électricien", 
-        "Élève", "Sportifs", "Personnel de sante", "Formateur", "Trader indep", 
-        "Chargé de clientèle", "CONTROLEUR DES DOUANES", "ASSISTANT DE  DIRECTION", 
-        "STAGIAIRE", "Angent de securité", "Pasteur", "S1p", "Plombier", "Security officer", 
-        "BUSINESMAN", "Footballeur ", "Technicien supérieur d’agriculture", "Vigil", 
-        "Coordiste", "PEINTRE", "ADMINISTRATEUR DES HOPITAUX", "chauffeur", "Hôtelier ", 
-        "Logisticien transport", "CHAUDRONIER", "Decorateur Baptiment", "Tâcheron", 
-        "Cuisinier", "Imprimeur ", "missionnaire", "Patissier", "Docker", "Réalisateur ", 
-        "assureur", "CHAUFFEUR ", "LAVEUR", "Coach kuine", "Conducteur", "Technicien ", 
-        "Conseiller client", "Entrepreneur", "Magasinier ", "constructeur en bâtiment", 
-        "Calier", "SOUDEUR", "AGENT D'APPUI PHARMICIE", "CHAUFFEUR", "Intendant ", 
-        "conducteurs d'engins genie civil", "Chauffeur ", "Assistant transit", 
-        "Agent des ressourses humaines", "Declarant en Douane", "Menuisier", "AIDE COMPTABLE", 
-        "TECHNICIEN GENIE CIVIL", "Transitaire", "Coiffeur", "Ménagère", "VENDEUSE", 
-        "médecin", "couturière", "Pompiste", "EDUCATEUR DES ENFANTS", "Hoteliere", 
-        "OUVRIER", "Débrouillard", "MACHINISTE", "FORREUR", "CASINO", "TECHNICIEN TOPO", 
-        "COUTURIERE", "RAS", "APPRENTI TOLERIE ", "SP", "Développeur en informatique ", 
-        "Sérigraphie", "Estheticien", "Maintenancier industriel ", "Auditeur interne", 
-        "Enseignant (e)", "Agent municipal ", "Tolier", "Agent de banque", "Prestataire de service et consultant sportif", 
-        "Dolker ", "photographe", "Agent d'exploitation", "Cheminot", "ARGENT DE SÉCURITÉ ", 
-        "Secrétaire comptable", "Contractuel d'administration", "Technicien de génie civile", 
-        "Juriste", "Informaticien ", "Technicien en genie civil", "Agent administratif ", 
-        "Comptable", "Laborantin", "Ingénieur génie civil", "Analyste -programmeur", 
-        "Logisticien", "Agent de securité", "Maçon", "Menuisier ", "MENUSIER", "MENUISIER ", 
-        "Plombier", "Bijoutier", "Soudeur", "Peintre", "Chaudronnier", "Électronicien ", 
-        "Electricien", "Machiniste", "Pâtissier ", "Menuisier", "CHAUDRONNIER", 
-        "Technicien génie civil", "Agent technique", "Technicien réseaux télécoms", 
-        "Infographe", "Architecte", "Assistante", "Ménagère", "Commerçant (e)", 
-        "Employé (e)  dans une entreprise", "Agent de sécurité", "Marin", "Débrouillard", 
-        "Personnel de sante", "Comptable", "Enseignant", "Fonctionnaires", "Magasinier", 
-        "Agent commercial", "Technicien", "Informaticien", "Electricien auto", 
-        "Technicien de génie civile", "Technicien d'agriculture", "Technicien en bâtiment", 
-        "Technicien en électricité", "Technicien en mécanique", "Technicien en plomberie", 
-        "Technicien en soudure", "Technicien en informatique", "Technicien en génie civil", 
-        "Technicien en électronique", "Technicien en climatisation", "Technicien en télécoms", 
-        "Technicien en topographie", "Technicien en maintenance", "Technicien en chauffage", 
-        "Technicien en froid", "Technicien en électricité bâtiment", "Technicien en électricité industrielle", 
-        "Technicien en mécanique auto", "Technicien en mécanique industrielle", 
-        "Technicien en plomberie sanitaire", "Technicien en soudure industrielle", 
-        "Technicien en informatique bureautique", "Technicien en informatique réseau", 
-        "Technicien en informatique développement", "Technicien en génie civil bâtiment", 
-        "Technicien en génie civil travaux publics", "Technicien en électronique numérique", 
-        "Technicien en électronique analogique", "Technicien en climatisation centrale", 
-        "Technicien en télécoms réseau", "Technicien en topographie terrestre", 
-        "Technicien en maintenance industrielle", "Technicien en chauffage central", 
-        "Technicien en froid industriel", "Technicien en électricité bâtiment résidentiel", 
-        "Technicien en électricité industrielle lourde", "Technicien en mécanique automobile", 
-        "Technicien en mécanique industrielle lourde", "Technicien en plomberie sanitaire résidentielle", 
-        "Technicien en soudure industrielle lourde", "Technicien en informatique bureautique avancée", 
-        "Technicien en informatique réseau avancé", "Technicien en informatique développement avancé", 
-        "Technicien en génie civil bâtiment avancé", "Technicien en génie civil travaux publics avancés", 
-        "Technicien en électronique numérique avancée", "Technicien en électronique analogique avancée", 
-        "Technicien en climatisation centrale avancée", "Technicien en télécoms réseau avancé", 
-        "Technicien en topographie terrestre avancée", "Technicien en maintenance industrielle avancée", 
-        "Technicien en chauffage central avancé", "Technicien en froid industriel avancé", 
-        "Technicien en électricité bâtiment résidentiel avancé", "Technicien en électricité industrielle lourde avancée", 
-        "Technicien en mécanique automobile avancée", "Technicien en mécanique industrielle lourde avancée", 
-        "Technicien en plomberie sanitaire résidentielle avancée", "Technicien en soudure industrielle lourde avancée", 
-        "Technicien en informatique bureautique expert", "Technicien en informatique réseau expert", 
-        "Technicien en informatique développement expert", "Technicien en génie civil bâtiment expert", 
-        "Technicien en génie civil travaux publics expert", "Technicien en électronique numérique expert", 
-        "Technicien en électronique analogique expert", "Technicien en climatisation centrale expert", 
-        "Technicien en télécoms réseau expert", "Technicien en topographie terrestre expert", 
-        "Technicien en maintenance industrielle expert", "Technicien en chauffage central expert", 
-        "Technicien en froid industriel expert", "Technicien en électricité bâtiment résidentiel expert", 
-        "Technicien en électricité industrielle lourde expert", "Technicien en mécanique automobile expert", 
-        "Technicien en mécanique industrielle lourde expert", "Technicien en plomberie sanitaire résidentielle expert", 
-        "Technicien en soudure industrielle lourde expert"
-    ]
-                religions = [
-        "Chretien (Catholique)", "Musulman", "Pas Précisé", "Chretien (Protestant )", 
-        "Adventiste", "Non-croyant", "pentecôtiste", "Chretien (Ne de nouveau)", 
-        "Traditionaliste", "BAPTISTE", "pentecôtiste", "Chrétien non précisé", 
-        "pentecotiste", "Chretien (Protestant)", "Musulmane"
-    ]
-                niveaux_etude = [
-        "Universitaire", "Aucun", "Secondaire", "Primaire", "Pas Précisé"
-    ]
-                statuts_matrimoniaux = [
-        "Célibataire", "Marié (e)", "veuf (veuve)", "Divorcé(e)"
-    ]
-                # ==============================
-                # 📌 FORMULAIRE DE SAISIE
-                # ==============================
-                with col1:
-                    age = st.number_input("Âge", min_value=18, max_value=100, value=30, step=1)
-    
-                    profession = st.selectbox("Profession",list(professions) )
-                    religion = st.selectbox("Religion", list(religions))
-                    Niveau_Etude =st.selectbox("Niveau_Etude", list(niveaux_etude))
-                    Statut_Matrimonial= st.selectbox("Statut_Matrimonial", list(statuts_matrimoniaux))
-                    # État de santé (Binaire : Oui/Non)
-                columns_binary = [
-                    "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
-                    "Hypertension", "Porteur_VIH_HBS_HCV", "Asthme",
-                    "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"
-                ]
-                columns_binarys=[
-                    "Drepanocytose", "Opere", "Transfusion_Antecedent", "Diabete",
-                    "Hypertension", "Porteur_VIH_HBS_HCV"]
-                columns_binaryss=["Asthme",
-                    "Probleme_Cardiaque", "Tatouage", "Scarification", "Deja_Donneur"]
-                
-                with col2:
-                    binary_inputs = {}
-                    for col in columns_binarys:
-                        binary_inputs[col] = st.radio(col, ["Non", "Oui"])
-                with col3:
-                    for col in columns_binaryss:
-                        binary_inputs[col] = st.radio(col, ["Non", "Oui"])
-    
-                # ==============================
-                # 🔄 PRÉPARATION DES DONNÉES
-                # ==============================
-                # Convertir les entrées utilisateur en dataframe
-                input_data = pd.DataFrame([[age, profession] + [binary_inputs[col] for col in columns_binary]+[religion,Niveau_Etude,Statut_Matrimonial]],
-                                        columns=["Age", "Profession"] + columns_binary+["Religion","Niveau_Etude","Statut_Matrimonial"])
-    
-                # Encoder Profession et Religion
-                input_data =preprocessor.transform(input_data)
-                # ==============================
-                # 🚀 PRÉDICTION
-                # ==============================
-                if st.button("Prédire l'éligibilité"):
-                    prediction = model.predict(input_data)[0]
-                    result = target_encoder.inverse_transform([prediction])[0]
-                     # Afficher des recommandations en fonction de la prédiction
-                    st.subheader("Recommandations")
-                    
-    
-    
-                    # Affichage du résultat
-                    if prediction == 1:
-                        st.success("✅ Le donneur est *ÉLIGIBLE* au don de sang !")
-                        st.balloons()
-                    else:
-                        st.error("❌ Le donneur *N'EST PAS ÉLIGIBLE* au don de sang.")
-    
-                    # Affichage des valeurs d'entrée encodées
-                    st.subheader("🔎 Données encodées utilisées pour la prédiction :")
-                    #st.dataframe(input_data)
+
+            # 🔄 Binarisation des étiquettes pour "One vs Rest" si multi-classe
+            n_classes = len(np.unique(y_test))  # Nombre de classes
+            y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))  # Transforme y_test en binaire
+            y_pred_proba = model.predict_proba(X_test)  # Probabilités prédites pour chaque classe
+
+            # 📈 Affichage de la courbe ROC pour chaque classe
+            st.subheader("📈 Courbe ROC (One vs Rest)")
+
+            fig, ax = plt.subplots(figsize=(7, 5))
+            colors = ['blue', 'red', 'green', 'purple', 'orange']  # Couleurs pour chaque classe
+
+            for i in range(n_classes):
+                if n_classes > 2:  # Cas multi-classe
+                    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_pred_proba[:, i])
+                    roc_auc = auc(fpr, tpr)
+                    ax.plot(fpr, tpr, color=colors[i % len(colors)], lw=2, label=f"Classe {A[i]} (AUC = {roc_auc:.2f})")
+                else:  # Cas binaire classique
+                    fpr, tpr, _ = roc_curve(y_test, y_pred_proba[:, 1])
+                    roc_auc = auc(fpr, tpr)
+                    ax.plot(fpr, tpr, color="blue", lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
+
+            ax.plot([0, 1], [0, 1], color="gray", linestyle="--")
+            ax.set_xlabel("Taux de Faux Positifs (FPR)")
+            ax.set_ylabel("Taux de Vrais Positifs (TPR)")
+            ax.set_title("Courbe ROC par Classe")
+            ax.legend(loc="lower right")
+            st.pyplot(fig)
+
             
+            # 📊 Matrice de Confusion
+            st.subheader("📊 Matrice de Confusion")
+            B=target_encoder.inverse_transform(y_test)
+            C=target_encoder.inverse_transform(y_pred)
+            conf_matrix = confusion_matrix(B, C)
+            fig, ax = plt.subplots()
+            sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
+            ax.set_title("Matrice de Confusion")
+            st.pyplot(fig)
+            # Afficher les probabilités
+            st.write("**Probabilités:**")
             
-            # ==============================
-            # 📥 ONGLET : TÉLÉCHARGEMENT / UPLOAD
-            # ==============================
-            with tab2:
-    
-                # ==============================
-                # 📥 TÉLÉCHARGEMENT DU FICHIER MODÈLE
-                # ==============================
-                st.subheader("📥 Télécharger le modèle de fichier Excel")
-                sample_data = pd.DataFrame({
-                    "Age": [30, 45],
-                    "Profession": ["Médecin", "Enseignant"],
-                    "Drepanocytose": ["Non", "Oui"],
-                    "Opere": ["Non", "Non"],
-                    "Transfusion_Antecedent": ["Oui", "Non"],
-                    "Diabete": ["Non", "Oui"],
-                    "Hypertension": ["Oui", "Non"],
-                    "Porteur_VIH_HBS_HCV": ["Non", "Non"],
-                    "Asthme": ["Non", "Oui"],
-                    "Probleme_Cardiaque": ["Non", "Non"],
-                    "Tatouage": ["Oui", "Non"],
-                    "Scarification": ["Non", "Oui"],
-                    "Deja_Donneur": ["Oui", "Non"],
-                    "Religion": ["Musulman", "Chrétien"],
-                    "Niveau_Etude":["Primaire","secondaire"],
-                    "Statut_Matrimonial":["Marier","Celibataire"]
-                })
-    
-                # Génération du fichier Excel à télécharger
-                output = io.BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    sample_data.to_excel(writer, index=False, sheet_name="Exemple")
-                    writer.close()
-    
-                st.download_button(
-                    label="📥 Télécharger le fichier modèle",
-                    data=output.getvalue(),
-                    file_name="Modele_Donneurs.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-    
-                # ==============================
-                # 📤 UPLOADER UN FICHIER EXCEL AVEC LES DONNEURS
-                # ==============================
-                st.subheader("📤 Uploader un fichier Excel contenant les informations des donneurs")
-                uploaded_file = st.file_uploader("Téléchargez un fichier Excel", type=["xlsx"])
-    
-                if uploaded_file:
-                    # Lecture du fichier
-                    df_uploaded = pd.read_excel(uploaded_file)
-    
-                    # Vérification des colonnes attendues
-                    expected_columns = sample_data.columns.tolist()
-                    if not all(col in df_uploaded.columns for col in expected_columns):
-                        st.error("⚠ Le fichier ne contient pas les bonnes colonnes ! Vérifiez le format et réessayez.")
-                    else:
-                        st.success("✅ Fichier chargé avec succès !")
-    
-                        # ==============================
-                        # 🔄 PRÉTRAITEMENT DES DONNÉES POUR TOUTES LES LIGNES
-                        # ==============================
-                        # Supprimer les lignes avec des valeurs non reconnues
-                        df_uploaded.dropna(inplace=True)
-                        colonne=["Age", "Profession", "Drepanocytose","Opere",
-                    "Transfusion_Antecedent","Diabete", "Hypertension", "Porteur_VIH_HBS_HCV", 
-                    "Asthme", "Probleme_Cardiaque","Tatouage","Scarification", "Deja_Donneur", "Religion","Niveau_Etude","Statut_Matrimonial"]
-                        input_data =preprocessor.transform(df_uploaded)
-                        df_uploadeds=input_data.copy()
-                        
-    
-                        # Encoder les valeurs binaires (Oui = 1, Non = 0)
-                        if df_uploadeds.shape[0] == 0:
-                            st.error("Aucune donnée valide après prétraitement ! vérifiez les données d'entrée")
-    
-                        # ==============================
-                        # 🚀 PRÉDICTION SUR TOUTES LES LIGNES
-                        # ==============================
-                        df_uploaded["Prédiction"] = model.predict(df_uploadeds)
-    
-                        # Décodage des résultats
-                        df_uploaded["Prédiction"] = df_uploaded["Prédiction"].map(lambda x: target_encoder.inverse_transform([x])[0])
-    
-                        # Affichage du tableau avec les prédictions
-                        st.subheader("📊 Résultats des prédictions")
-                        st.dataframe(df_uploaded)
-    
-                        # ==============================
-                        # 📤 TÉLÉCHARGER LE FICHIER AVEC PREDICTIONS
-                        # ==============================
-                        output_predictions = io.BytesIO()
-                        with pd.ExcelWriter(output_predictions, engine='xlsxwriter') as writer:
-                            df_uploaded.to_excel(writer, index=False, sheet_name="Prédictions")
-                            writer.close()
-    
-                        st.download_button(
-                            label="📥 Télécharger les résultats",
-                            data=output_predictions.getvalue(),
-                            file_name="Resultats_Predictions.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        )
-    
-        # ==============================
-        # 📈 ONGLET : PERFORMANCE DU MODÈLE
-        # ==============================
-            with tab3:
-                # ==============================
-                # 🎯 CHARGEMENT DU MODÈLE & DONNÉES TEST
-                # ==============================
-                @st.cache_resource
-                def load_model():
-                   pathse="eligibility_model.pkl"
-                   data = joblib.load(pathse)
-                   return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"],data["resultat"]
-    
-                model, X_test, y_test, target_encoder, preprocessor,resultat = load_model()
-                    # ==============================
-                # 📊 PERFORMANCE DU MODÈLE SUR DONNÉES TEST
-                # ==============================
-                st.subheader("📈 Performance du Modèle sur Données de Test")
-    
-                # 🔮 Prédictions sur X_test
-                y_pred_proba = model.predict_proba(X_test)[:, 1]
-                y_pred = model.predict(X_test)
-    
-                # 📄 Rapport de Classification
-                st.subheader("📄 Rapport de Classification")
-                A=target_encoder.inverse_transform([0,1,2])
-                report = classification_report(y_test, y_pred, target_names=A, output_dict=True)
-                df_report = pd.DataFrame(report).transpose()
-                st.dataframe(df_report)
-                st.dataframe(resultat)
-                
-    
-                # 🔄 Binarisation des étiquettes pour "One vs Rest" si multi-classe
-                n_classes = len(np.unique(y_test))  # Nombre de classes
-                y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))  # Transforme y_test en binaire
-                y_pred_proba = model.predict_proba(X_test)  # Probabilités prédites pour chaque classe
-    
-                # 📈 Affichage de la courbe ROC pour chaque classe
-                st.subheader("📈 Courbe ROC (One vs Rest)")
-    
-                fig, ax = plt.subplots(figsize=(7, 5))
-                colors = ['blue', 'red', 'green', 'purple', 'orange']  # Couleurs pour chaque classe
-    
-                for i in range(n_classes):
-                    if n_classes > 2:  # Cas multi-classe
-                        fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_pred_proba[:, i])
-                        roc_auc = auc(fpr, tpr)
-                        ax.plot(fpr, tpr, color=colors[i % len(colors)], lw=2, label=f"Classe {A[i]} (AUC = {roc_auc:.2f})")
-                    else:  # Cas binaire classique
-                        fpr, tpr, _ = roc_curve(y_test, y_pred_proba[:, 1])
-                        roc_auc = auc(fpr, tpr)
-                        ax.plot(fpr, tpr, color="blue", lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
-    
-                ax.plot([0, 1], [0, 1], color="gray", linestyle="--")
-                ax.set_xlabel("Taux de Faux Positifs (FPR)")
-                ax.set_ylabel("Taux de Vrais Positifs (TPR)")
-                ax.set_title("Courbe ROC par Classe")
-                ax.legend(loc="lower right")
-                st.pyplot(fig)
-    
-                
-                # 📊 Matrice de Confusion
-                st.subheader("📊 Matrice de Confusion")
-                B=target_encoder.inverse_transform(y_test)
-                C=target_encoder.inverse_transform(y_pred)
-                conf_matrix = confusion_matrix(B, C)
-                fig, ax = plt.subplots()
-                sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
-                ax.set_title("Matrice de Confusion")
-                st.pyplot(fig)
-                # Afficher les probabilités
-                st.write("**Probabilités:**")
-                
-                # Créer un DataFrame pour les probabilités
-                proba_df = pd.DataFrame({
-                    'Statut': model.classes_,
-                    'Probabilité': y_pred_proba[0]
+            # Créer un DataFrame pour les probabilités
+            proba_df = pd.DataFrame({
+                'Statut': model.classes_,
+                'Probabilité': y_pred_proba[0]
+            })
+            
+            # Créer un graphique à barres pour les probabilités
+            fig = px.bar(
+                proba_df,
+                x='Statut',
+                y='Probabilité',
+                title="Probabilités pour chaque statut d'éligibilité",
+                labels={'Probabilité': 'Probabilité', 'Statut': "Statut d'éligibilité"}
+            )
+            
+            fig.update_layout(
+                xaxis_title="Statut d'éligibilité",
+                yaxis_title="Probabilité",
+                font=dict(size=12),
+                height=400
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+
+            #if hasattr(model, 'feature_importances_'):
+            # Obtenir les noms des caractéristiques après one-hot encoding
+            feature_names = []
+            for name, transformer, features in preprocessor.transformers_:
+                if name == 'cat':
+                    # Pour les caractéristiques catégorielles, obtenir les noms après one-hot encoding
+                    for i, feature in enumerate(features):
+                        categories = transformer.named_steps['onehot'].categories_[i]
+                        for category in categories:
+                            feature_names.append(f"{feature}_{category}")
+                else:
+                    # Pour les caractéristiques numériques, conserver les noms d'origine
+                    feature_names.extend(features)
+            
+            # Obtenir les importances des caractéristiques
+            importances = model.feature_importances_
+            
+            # Créer un DataFrame pour les importances
+            if len(feature_names) == len(importances):
+                importance_df = pd.DataFrame({
+                    'Feature': feature_names,
+                    'Importance': importances
                 })
                 
-                # Créer un graphique à barres pour les probabilités
-                fig = px.bar(
-                    proba_df,
-                    x='Statut',
-                    y='Probabilité',
-                    title="Probabilités pour chaque statut d'éligibilité",
-                    labels={'Probabilité': 'Probabilité', 'Statut': "Statut d'éligibilité"}
+                # Trier par importance décroissante
+                importance_df = importance_df.sort_values('Importance', ascending=False).head(15)
+                
+                # Créer un graphique des importances
+                fig_importance = px.bar(
+                    importance_df,
+                    x='Importance',
+                    y='Feature',
+                    orientation='h',
+                    title="Importance des caractéristiques pour la prédiction d'éligibilité",
+                    labels={'Importance': 'Importance relative', 'Feature': 'Caractéristique'}
                 )
                 
-                fig.update_layout(
-                    xaxis_title="Statut d'éligibilité",
-                    yaxis_title="Probabilité",
+                fig_importance.update_layout(
+                    xaxis_title="Importance relative",
+                    yaxis_title="Caractéristique",
                     font=dict(size=12),
-                    height=400
+                    height=600
                 )
-                
-                st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig_importance)
+           
+                    
+                    
     
-                #if hasattr(model, 'feature_importances_'):
-                # Obtenir les noms des caractéristiques après one-hot encoding
-                feature_names = []
-                for name, transformer, features in preprocessor.transformers_:
-                    if name == 'cat':
-                        # Pour les caractéristiques catégorielles, obtenir les noms après one-hot encoding
-                        for i, feature in enumerate(features):
-                            categories = transformer.named_steps['onehot'].categories_[i]
-                            for category in categories:
-                                feature_names.append(f"{feature}_{category}")
-                    else:
-                        # Pour les caractéristiques numériques, conserver les noms d'origine
-                        feature_names.extend(features)
-                
-                # Obtenir les importances des caractéristiques
-                importances = model.feature_importances_
-                
-                # Créer un DataFrame pour les importances
-                if len(feature_names) == len(importances):
-                    importance_df = pd.DataFrame({
-                        'Feature': feature_names,
-                        'Importance': importances
-                    })
-                    
-                    # Trier par importance décroissante
-                    importance_df = importance_df.sort_values('Importance', ascending=False).head(15)
-                    
-                    # Créer un graphique des importances
-                    fig_importance = px.bar(
-                        importance_df,
-                        x='Importance',
-                        y='Feature',
-                        orientation='h',
-                        title="Importance des caractéristiques pour la prédiction d'éligibilité",
-                        labels={'Importance': 'Importance relative', 'Feature': 'Caractéristique'}
-                    )
-                    
-                    fig_importance.update_layout(
-                        xaxis_title="Importance relative",
-                        yaxis_title="Caractéristique",
-                        font=dict(size=12),
-                        height=600
-                    )
-                st.plotly_chart(fig_importance)
-               
-                        
-                        
-        
-        # Pied de page
-        st.markdown("---")
-        st.markdown(""" <div style="text-align: center;">
-            <p>Tableau de bord développé pour le concours de data visualisation sur les donneurs de sang</p>
-            <p>© 2025 - Tous droits réservés</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # Pied de page
+    st.markdown("---")
+    st.markdown(""" <div style="text-align: center;">
+        <p>Tableau de bord développé pour le concours de data visualisation sur les donneurs de sang</p>
+        <p>© 2025 - Tous droits réservés</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Point d'entrée principal
     if __name__ == "__main__":
