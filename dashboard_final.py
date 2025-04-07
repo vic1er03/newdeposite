@@ -2075,6 +2075,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Point d'entrée principal
-    if __name__ == "__main__":
-        main()
+# Point d'entrée principal
+if __name__ == "__main__":
+    main()
