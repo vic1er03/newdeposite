@@ -112,12 +112,6 @@ def paginate_dataframe(dataframe, page_size=10):
 
 
 # Configuration de la page Streamlit
-st.set_page_config(
-    page_title="Analyse des Donneurs de Sang",
-    page_icon="💉",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Définir les chemins des fichiers
 data_2019_path = "data_2019_preprocessed.csv"
