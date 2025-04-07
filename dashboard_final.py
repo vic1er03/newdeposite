@@ -1108,9 +1108,21 @@ def main():
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Nombre de donneurs (2019)", len(df_2019))
+            st.markdown('<div class="metric-box">'
+                                    '<h4>Nombre de donneurs (2019)</h4>'
+                                    '<h2>Nombre de donneurs (2020)</p>'
+                                    '<p>Nombre de donneurs (volontaire)</p>'
+                                    '</div>',
+                        unsafe_alloz_html=True)
+                        
+            #st.metric("Nombre de donneurs (2019)", len(df_2019))
         with col2:
-            st.metric("Nombre de donneurs (2020)", len(df_2020))
+            st.markdown(f'''<div class="metric-box">'
+                                    '<h4>Nombre de donneurs (2019)</h4>'
+                                    '<h2>{len(df_2019)}</h2>'
+                                    '</div>''',
+                        unsafe_alloz_html=True)
+            #st.metric("Nombre de donneurs (2020)", len(df_2020))
         with col3:
             st.metric("Nombre de donneurs (Volontaires)", len(df_volontaire))
         
