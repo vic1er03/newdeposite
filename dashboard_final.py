@@ -1598,8 +1598,10 @@ def main():
             df_selected = df_volontaire
     
         with st.expander("🎯 Analyse interactive du dataset sélectionné"):
-            pyg_html = pyg.walk(df_selected, output_type='html')
-            components.html(pyg_html, height=500, scrolling=True)
+            #pyg_html = pyg.walk(df_selected, output_type='html')
+            #components.html(pyg_html, height=500, scrolling=True)
+            pyg_app=StreamlitRenderer(df_selected)
+            pyg_app.explorer()
     
         # Upload CSV ou Excel
         st.markdown("---")
@@ -1619,8 +1621,10 @@ def main():
             if data is not None:
                 st.success("✅ Fichier chargé avec succès !")
                 with st.expander("📊 Analyse interactive de ton fichier importé"):
-                    pyg_html = pyg.walk(data, output_type='html')
-                    components.html(pyg_html, height=500, scrolling=True)
+                    #pyg_html = pyg.walk(data, output_type='html')
+                    #components.html(pyg_html, height=500, scrolling=True)
+                    pyg_app=StreamlitRenderer(data)
+                    pyg_app.explorer()
 
         
     elif page == "Prédiction d'éligibilité":
