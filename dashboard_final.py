@@ -1106,70 +1106,92 @@ def main():
             visualize_missing_values(df_volontaire, "Données Volontaire")
             analyze_distributions(df_volontaire, "Données Volontaire")
 
-        # CSS personnalisé
+       # CSS personnalisé pour styling clair et propre
         st.markdown("""
             <style>
-                .metric-block {
-                    background-color: #e6f0fa;
-                    padding: 15px;
-                    border-radius: 12px;
+                .kpi-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin: 10px;
+                }
+        
+                .kpi-top {
+                    background-color: #f4f4f4;
+                    padding: 10px 15px;
+                    border-radius: 12px 12px 0 0;
                     text-align: center;
-                    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-                }
-                .metric-icon {
-                    font-size: 30px;
-                }
-                .metric-label {
+                    width: 100%;
+                    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
                     font-weight: bold;
-                    margin: 5px 0;
                     font-size: 16px;
                 }
-                .metric-value {
+        
+                .kpi-icon {
+                    font-size: 30px;
+                }
+        
+                .kpi-label {
+                    margin-top: 5px;
+                }
+        
+                .kpi-bottom {
+                    background-color: #d0e7ff;
+                    padding: 15px;
+                    border-radius: 0 0 12px 12px;
+                    text-align: center;
+                    width: 100%;
                     font-size: 24px;
-                    color: #0066cc;
                     font-weight: bold;
+                    color: #004080;
+                    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
                 }
             </style>
         """, unsafe_allow_html=True)
         
-        # Colonnes pour les 3 métriques
+        # Colonnes pour 3 blocs
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown(f"""
-                <div class="metric-block">
-                    <div class="metric-icon">🩸</div>
-                    <div class="metric-label">Nombre de donneurs (2019)</div>
-                    <div class="metric-value">{len(df_2019)}</div>
+                <div class="kpi-container">
+                    <div class="kpi-top">
+                        <div class="kpi-icon">🩸</div>
+                        <div class="kpi-label">Donneurs 2019</div>
+                    </div>
+                    <div class="kpi-bottom">{len(df_2019)}</div>
                 </div>
             """, unsafe_allow_html=True)
         
         with col2:
             st.markdown(f"""
-                <div class="metric-block">
-                    <div class="metric-icon">🩸</div>
-                    <div class="metric-label">Nombre de donneurs (2020)</div>
-                    <div class="metric-value">{len(df_2020)}</div>
+                <div class="kpi-container">
+                    <div class="kpi-top">
+                        <div class="kpi-icon">🩸</div>
+                        <div class="kpi-label">Donneurs 2020</div>
+                    </div>
+                    <div class="kpi-bottom">{len(df_2020)}</div>
                 </div>
             """, unsafe_allow_html=True)
         
         with col3:
             st.markdown(f"""
-                <div class="metric-block">
-                    <div class="metric-icon">🩸</div>
-                    <div class="metric-label">Donneurs Volontaires</div>
-                    <div class="metric-value">{len(df_volontaire)}</div>
+                <div class="kpi-container">
+                    <div class="kpi-top">
+                        <div class="kpi-icon">🩸</div>
+                        <div class="kpi-label">Volontaires</div>
+                    </div>
+                    <div class="kpi-bottom">{len(df_volontaire)}</div>
                 </div>
             """, unsafe_allow_html=True)
-            
-            st.subheader("Aperçu des données")
+
         
-            if dataset=="2019":
-                Apercue(df_2019)
-            elif dataset=="2020":
-                Apercue(df_2020)
-            else :
-                Apercue(df_volontaire)
+        if dataset=="2019":
+            Apercue(df_2019)
+        elif dataset=="2020":
+            Apercue(df_2020)
+        else :
+            Apercue(df_volontaire)
             
      # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
