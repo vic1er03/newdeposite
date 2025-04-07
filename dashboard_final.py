@@ -1366,6 +1366,10 @@ def main():
     df_2019, df_2020, df_volontaire =load_data() 
     
     if page == "Profils des donneurs":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Profil_donneur.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
         st.header("👥 Profils des donneurs")
         
         # Effectuer le clustering des donneurs
@@ -1508,6 +1512,10 @@ def main():
             st.warning("Impossible d'analyser les tendances temporelles car aucune colonne de date appropriée n'a été identifiée.")
     
     elif page == "Fidélisation des donneurs":
+        # Afficher l'image en haut, sur toute la largeur
+        image_file="Fidélisation.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
         st.header("🔄 Fidélisation des donneurs")
         
         # Créer des visualisations pour l'analyse de fidélisation
@@ -1545,6 +1553,10 @@ def main():
             st.warning("Impossible d'analyser la fidélisation car les informations nécessaires ne sont pas disponibles dans les données.")
     
     elif page == "Analyse de sentiment":
+         # Afficher l'image en haut, sur toute la largeur
+        image_file="Analyse_sentiment.jpg"
+        image = Image.open(image_file)
+        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
         st.header("🩺 Conditions de santé et éligibilité au don")   
         data_2019_path ="data_2019_pretraite.csv"
         data_2020_path = "data_2020_pretraite.csv"
