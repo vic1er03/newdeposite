@@ -27,6 +27,7 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from tqdm import tqdm
 from PIL import Image
+import streamlit.components.v1 as components
 
 #import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -1590,14 +1591,15 @@ def main():
             
     elif page == "Bonus":
         if dataset=="2019":
-            pyg_app=StreamlitRenderer(df_2019)
-            pyg_app.explorer()
+            pyg_html = pyg.walk(df_2019, output_type='html')
+            components.html(pyg_html, height=800, scrolling=True)
         if dataset=="2020":
-            pyg_app=StreamlitRenderer(df_2020)
-            pyg_app.explorer()
+            pyg_html = pyg.walk(df_2020, output_type='html')
+            components.html(pyg_html, height=800, scrolling=True)
+            
         else :
-            pyg_app=StreamlitRenderer(df_volontaire)
-            pyg_app.explorer()
+            pyg_html = pyg.walk(df_volontaire, output_type='html')
+            components.html(pyg_html, height=800, scrolling=True)
         
         uploaded_file = st.file_uploader("Ton fichier Csv")
         if uploaded_file is not None :
