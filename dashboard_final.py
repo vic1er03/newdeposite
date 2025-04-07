@@ -929,32 +929,50 @@ def analyze_distributions(df, sheet_name):
         
             # Créer une figure avec plusieurs sous-graphique
             fig, ax = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(n_cols * 5, n_rows * 4))
-            
-            # Vérifier si ax est une matrice ou un seul axe
-            if n_rows == 1 and n_cols == 1:
-                ax = np.array([ax])  # Convertir en tableau 2D pour rendre l'indexation uniforme
+        
+            # Si ax est une matrice 2D, il faut ajuster l'indexation
+            if n_rows == 1 or n_cols == 1:
+                ax = np.squeeze(ax)  # Convertir en un tableau 1D si nécessaire
         
             # Choisir une couleur différente pour chaque graphique
             color = colors[i % len(colors)]
             
             # Histogramme avec KDE
-            sns.histplot(df[col].dropna(), kde=True, ax=ax[row, col_idx], color=color, alpha=0.7)
-            ax[row, col_idx].set_title(f'Distribution de {col}')
-            ax[row, col_idx].set_xlabel(col)
-            ax[row, col_idx].set_ylabel('Fréquence')
+            if n_rows == 1 or n_cols == 1:
+                sns.histplot(df[col].dropna(), kde=True, ax=ax, color=color, alpha=0.7)
+                ax.set_title(f'Distribution de {col}')
+                ax.set_xlabel(col)
+                ax.set_ylabel('Fréquence')
+            else:
+                sns.histplot(df[col].dropna(), kde=True, ax=ax[row, col_idx], color=color, alpha=0.7)
+                ax[row, col_idx].set_title(f'Distribution de {col}')
+                ax[row, col_idx].set_xlabel(col)
+                ax[row, col_idx].set_ylabel('Fréquence')
             
             # Test de normalité
             stat, p_value = stats.shapiro(df[col].dropna())
             normality = "normale" if p_value > 0.05 else "non normale"
-            ax[row, col_idx].annotate(f'p = {p_value:.4f}\nDistribution {normality}',
-                                     xy=(0.05, 0.95), xycoords='axes fraction',
-                                     bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                                     ha='left', va='top')
             
+            if n_rows == 1 or n_cols == 1:
+                ax.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
+                            xy=(0.05, 0.95), xycoords='axes fraction',
+                            bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                            ha='left', va='top')
+            else:
+                ax[row, col_idx].annotate(f'p = {p_value:.4f}\nDistribution {normality}',
+                                          xy=(0.05, 0.95), xycoords='axes fraction',
+                                          bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                                          ha='left', va='top')
+        
             # Boxplot
-            sns.boxplot(x=df[col].dropna(), ax=ax[row, col_idx], color=color)
-            ax[row, col_idx].set_title(f'Boxplot de {col}')
-            ax[row, col_idx].set_xlabel(col)
+            if n_rows == 1 or n_cols == 1:
+                sns.boxplot(x=df[col].dropna(), ax=ax, color=color)
+                ax.set_title(f'Boxplot de {col}')
+                ax.set_xlabel(col)
+            else:
+                sns.boxplot(x=df[col].dropna(), ax=ax[row, col_idx], color=color)
+                ax[row, col_idx].set_title(f'Boxplot de {col}')
+                ax[row, col_idx].set_xlabel(col)
         
             # Statistiques descriptives
             stats_desc = df[col].describe()
@@ -963,15 +981,22 @@ def analyze_distributions(df, sheet_name):
                           f"Écart-type: {stats_desc['std']:.2f}\n"
                           f"Min: {stats_desc['min']:.2f}\n"
                           f"Max: {stats_desc['max']:.2f}")
-            ax[row, col_idx].annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
-                                      bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                                      ha='left', va='top')
+            
+            if n_rows == 1 or n_cols == 1:
+                ax.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
+                            bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                            ha='left', va='top')
+            else:
+                ax[row, col_idx].annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
+                                          bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                                          ha='left', va='top')
         
             # Personnaliser le fond de la figure
             fig.patch.set_facecolor('lightgray')  # Fond de la figure
         
             # Affichage de la figure
             st.pyplot(fig)
+
 
 
         # Graphique interactif Violin
