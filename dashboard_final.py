@@ -1041,12 +1041,12 @@ def main():
         with col2:
             st.write("")  # Espace vide ou texte complémentaire si tu veux
         
-        st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
-        st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
-        st.markdown("""
-        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
-        permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
-        """)
+            st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
+            st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
+            st.markdown("""
+            Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+            permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
+            """)
         
         #set_background(image_file)
         """
