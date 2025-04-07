@@ -15,6 +15,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import folium
 from folium.plugins import MarkerCluster, HeatMap
+from streamlit_option_menu import option_menu
+
 from streamlit_folium import folium_static
 import geopandas as gpd
 from sklearn.cluster import KMeans
@@ -1019,13 +1021,16 @@ def main():
     # Charger les données
     df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
     
-    # Barre latérale pour la navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio(
-        "Sélectionnez une page",
-        ["Accueil","Aperçu des données", "Distribution géographique", "Santé et éligibilité", 
+    with st.sidebar:
+    selected = option_menu(
+        "Navigation",
+        ["Accueil", "Aperçu des données", "Distribution géographique", "Santé et éligibilité",
          "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
-         "Analyse de sentiment", "Prédiction d'éligibilité","Bonus"]
+         "Analyse de sentiment", "Prédiction d'éligibilité", "Bonus"],
+        icons=["house", "bar-chart", "geo-alt", "heart-pulse", "people", "megaphone",
+               "person-check", "chat-dots", "cpu", "gift"],
+        menu_icon="cast",
+        default_index=0,
     )
     
     # Sélection du jeu de données
