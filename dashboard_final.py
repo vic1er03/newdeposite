@@ -1018,11 +1018,11 @@ def analyze_distributions(df, sheet_name):
 
 # Interface principale du tableau de bord
 def main():
-
     # === Chargement des données ===
     df_2019, df_2020, df_volontaire = load_data()
     
     # === Barre latérale avec menu de navigation ===
+    st.sidebar.image('Image_sang.jpg')
     
     page = st.sidebar.option_menu(
         "Navigation",
