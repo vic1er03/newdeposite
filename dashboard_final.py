@@ -1161,16 +1161,15 @@ def main():
                     <div class="metric-value">{len(df_volontaire)}</div>
                 </div>
             """, unsafe_allow_html=True)
+            
+            st.subheader("Aperçu des données")
         
-                
-                st.subheader("Aperçu des données")
-        
-                if dataset=="2019":
-                    Apercue(df_2019)
-                elif dataset=="2020":
-                    Apercue(df_2020)
-                else :
-                    Apercue(df_volontaire)
+            if dataset=="2019":
+                Apercue(df_2019)
+            elif dataset=="2020":
+                Apercue(df_2020)
+            else :
+                Apercue(df_volontaire)
             
      # Charger les données
     df_2019, df_2020, df_volontaire =load_data() 
