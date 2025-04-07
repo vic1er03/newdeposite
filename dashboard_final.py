@@ -1023,26 +1023,23 @@ def main():
     df_2019, df_2020, df_volontaire = load_data()
     
     # === Barre latérale avec menu de navigation ===
-    with st.sidebar:
-        page = option_menu(
-            "Navigation",
-            ["Accueil", "Aperçu des données", "Distribution géographique", "Santé et éligibilité",
-             "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
-             "Analyse de sentiment", "Prédiction d'éligibilité", "Bonus"],
-            icons=["house", "bar-chart", "geo-alt", "heart-pulse", "people", "megaphone",
-                   "person-check", "chat-dots", "cpu", "gift"],
-            menu_icon="cast",
-            default_index=0,
-        )
     
-        st.markdown("---")  # séparation visuelle
+    page = st.sidebar.option_menu(
+        "Navigation",
+        ["Accueil", "Aperçu des données", "Distribution géographique", "Santé et éligibilité",
+         "Profils des donneurs", "Analyse des campagnes", "Fidélisation des donneurs",
+         "Analyse de sentiment", "Prédiction d'éligibilité", "Bonus"],
+        icons=["house", "bar-chart", "geo-alt", "heart-pulse", "people", "megaphone",
+               "person-check", "chat-dots", "cpu", "gift"],
+        menu_icon="cast",
+        default_index=0,
+    )
     
-        # === Sélection du jeu de données ===
-        st.subheader("Jeu de données")
-        dataset = st.radio(
-            "Sélectionnez un jeu de données",
-            ["2019", "Volontaire", "2020"]
-        )
+    st.markdown("---")  # séparation visuelle
+    dataset = st.sidebar.radio(
+        "Sélectionnez un jeu de données",
+        ["2019", "Volontaire", "2020"]
+    )
     
     # === Affichage de la page sélectionnée ===
     st.write(f"Page sélectionnée : {page}")
