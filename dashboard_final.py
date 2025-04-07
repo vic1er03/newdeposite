@@ -1589,41 +1589,41 @@ def main():
         
         
             
-   elif page == "Bonus":
-    st.markdown("### 🔍 Bonus - Exploration Interactive avec Pygwalker")
-
-    # Section Pygwalker selon le dataset choisi
-    if dataset == "2019":
-        df_selected = df_2019
-    elif dataset == "2020":
-        df_selected = df_2020
-    else:
-        df_selected = df_volontaire
-
-    with st.expander("🎯 Analyse interactive du dataset sélectionné"):
-        pyg_html = pyg.walk(df_selected, output_type='html')
-        components.html(pyg_html, height=500, scrolling=True)
-
-    # Upload CSV ou Excel
-    st.markdown("---")
-    st.markdown("### 📂 Importer ton propre fichier")
-
-    uploaded_file = st.file_uploader("Choisis un fichier CSV ou Excel", type=["csv", "xlsx"])
-
-    if uploaded_file is not None:
-        if uploaded_file.name.endswith(".csv"):
-            data = pd.read_csv(uploaded_file)
-        elif uploaded_file.name.endswith(".xlsx"):
-            data = pd.read_excel(uploaded_file)
+   elif page == "Bonus" : 
+        st.markdown("### 🔍 Bonus - Exploration Interactive avec Pygwalker")
+    
+        # Section Pygwalker selon le dataset choisi
+        if dataset == "2019":
+            df_selected = df_2019
+        elif dataset == "2020":
+            df_selected = df_2020
         else:
-            st.warning("Format non supporté.")
-            data = None
-
-        if data is not None:
-            st.success("✅ Fichier chargé avec succès !")
-            with st.expander("📊 Analyse interactive de ton fichier importé"):
-                pyg_html = pyg.walk(data, output_type='html')
-                components.html(pyg_html, height=500, scrolling=True)
+            df_selected = df_volontaire
+    
+        with st.expander("🎯 Analyse interactive du dataset sélectionné"):
+            pyg_html = pyg.walk(df_selected, output_type='html')
+            components.html(pyg_html, height=500, scrolling=True)
+    
+        # Upload CSV ou Excel
+        st.markdown("---")
+        st.markdown("### 📂 Importer ton propre fichier")
+    
+        uploaded_file = st.file_uploader("Choisis un fichier CSV ou Excel", type=["csv", "xlsx"])
+    
+        if uploaded_file is not None:
+            if uploaded_file.name.endswith(".csv"):
+                data = pd.read_csv(uploaded_file)
+            elif uploaded_file.name.endswith(".xlsx"):
+                data = pd.read_excel(uploaded_file)
+            else:
+                st.warning("Format non supporté.")
+                data = None
+    
+            if data is not None:
+                st.success("✅ Fichier chargé avec succès !")
+                with st.expander("📊 Analyse interactive de ton fichier importé"):
+                    pyg_html = pyg.walk(data, output_type='html')
+                    components.html(pyg_html, height=500, scrolling=True)
 
         
     elif page == "Prédiction d'éligibilité":
