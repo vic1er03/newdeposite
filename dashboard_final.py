@@ -1108,6 +1108,7 @@ def main():
 
        # CSS personnalisé pour styling clair et propre
         # CSS personnalisé
+        # CSS personnalisé
         st.markdown("""
             <style>
                 .kpi-container {
@@ -1118,53 +1119,41 @@ def main():
                 }
         
                 .kpi-top {
-                    background-color: #f0f0f0; /* gris clair */
-                    padding: 10px 15px;
+                    background-color: #d0e7ff;
+                    padding: 10px;
                     border-radius: 12px;
                     text-align: center;
                     width: 100%;
-                    box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
-                    font-weight: bold;
                     font-size: 16px;
-                }
-        
-                .kpi-icon {
-                    font-size: 30px;
-                }
-        
-                .kpi-label {
-                    margin-top: 5px;
-                }
-        
-                .kpi-spacer {
-                    height: 15px;
+                    font-weight: bold;
+                    color: #003366;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 8px;
                 }
         
                 .kpi-bottom {
-                    background-color: #d0e7ff;  /* bleu ciel */
+                    border: 2px solid #d0d0d0;
                     padding: 15px;
-                    border-radius: 12px;
+                    border-radius: 10px;
                     text-align: center;
                     width: 100%;
                     font-size: 24px;
                     font-weight: bold;
-                    color: #004080;
-                    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+                    color: #333;
+                    margin-top: 12px;
                 }
             </style>
         """, unsafe_allow_html=True)
         
-        # 3 Colonnes
+        # Affichage dans les colonnes
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown(f"""
                 <div class="kpi-container">
-                    <div class="kpi-top">
-                        <div class="kpi-icon">🩸</div>
-                        <div class="kpi-label">Donneurs 2019</div>
-                    </div>
-                    <div class="kpi-spacer"></div>
+                    <div class="kpi-top">🩸 Donneurs 2019</div>
                     <div class="kpi-bottom">{len(df_2019)}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1172,11 +1161,7 @@ def main():
         with col2:
             st.markdown(f"""
                 <div class="kpi-container">
-                    <div class="kpi-top">
-                        <div class="kpi-icon">🩸</div>
-                        <div class="kpi-label">Donneurs 2020</div>
-                    </div>
-                    <div class="kpi-spacer"></div>
+                    <div class="kpi-top">🩸 Donneurs 2020</div>
                     <div class="kpi-bottom">{len(df_2020)}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1184,14 +1169,11 @@ def main():
         with col3:
             st.markdown(f"""
                 <div class="kpi-container">
-                    <div class="kpi-top">
-                        <div class="kpi-icon">🩸</div>
-                        <div class="kpi-label">Volontaires</div>
-                    </div>
-                    <div class="kpi-spacer"></div>
+                    <div class="kpi-top">🩸 Volontaires</div>
                     <div class="kpi-bottom">{len(df_volontaire)}</div>
                 </div>
             """, unsafe_allow_html=True)
+
 
 
         
