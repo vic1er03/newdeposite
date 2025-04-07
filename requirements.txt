@@ -20,3 +20,4 @@ geopy
 openpyxl
 pygwalker
 streamlit_option_menu
+streamlit_extras 
