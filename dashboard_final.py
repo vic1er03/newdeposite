@@ -1018,9 +1018,11 @@ def analyze_distributions(df, sheet_name):
 
 # Interface principale du tableau de bord
 def main():
-    # Charger les données
-    df_2019, df_2020, df_volontaire =load_data() #"df,df_volontaires"
+
+    # === Chargement des données ===
+    df_2019, df_2020, df_volontaire = load_data()
     
+    # === Barre latérale avec menu de navigation ===
     with st.sidebar:
         page = option_menu(
             "Navigation",
@@ -1032,31 +1034,38 @@ def main():
             menu_icon="cast",
             default_index=0,
         )
-        st.write(f"Page sélectionnée : {selected}")
-    # Sélection du jeu de données
-    st.sidebar.title("Jeu de données")
-    dataset = st.sidebar.radio(
-        "Sélectionnez un jeu de données",
-        ["2019", "Volontaire","2020"]
-    )
     
+        st.markdown("---")  # séparation visuelle
     
+        # === Sélection du jeu de données ===
+        st.subheader("Jeu de données")
+        dataset = st.radio(
+            "Sélectionnez un jeu de données",
+            ["2019", "Volontaire", "2020"]
+        )
+    
+    # === Affichage de la page sélectionnée ===
+    st.write(f"Page sélectionnée : {page}")
+    
+    # === Logique d'affichage par page ===
     if page == "Accueil":
-        # Afficher l'image en haut, sur toute la largeur
-        image_file="Image_sang.jpg"
-        image = Image.open(image_file)
-        st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
+        image_file = "Image_sang.jpg"
+        try:
+            image = Image.open(image_file)
+            st.image(image, use_container_width=True)
+        except:
+            st.warning("Image non trouvée ou erreur de chargement.")
+    
+        # Titre et description
         st.markdown('<p style="color:black;">Texte en noir</p>', unsafe_allow_html=True)
         st.title("📊 Tableau de Bord d'Analyse des Donneurs de Sang")
         st.markdown("""
-        Ce tableau de bord interactif présente une analyse approfondie des données de donneurs de sang,
+        Ce tableau de bord interactif présente une **analyse approfondie des données de donneurs de sang**,
         permettant d'optimiser les campagnes de don et d'améliorer la gestion des donneurs.
         """)
-        
-        #set_background(image_file)
-        """
-        Fonction principale qui crée l'interface du tableau de bord Streamlit.
-        """
+
+# Tu peux ensuite continuer à ajouter les autres blocs : Aperçu des données, Distribution, etc.
+
 
     
 
