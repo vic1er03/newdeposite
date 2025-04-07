@@ -912,6 +912,7 @@ def analyze_distributions(df, sheet_name):
         st.subheader("Variables numériques")
         selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
         
+        
         # Exemple de couleurs personnalisées pour chaque graphique
         colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
         
@@ -996,6 +997,7 @@ def analyze_distributions(df, sheet_name):
         
             # Affichage de la figure
             st.pyplot(fig)
+
 
 
 
