@@ -4,6 +4,8 @@ pour répondre aux objectifs du concours de data visualisation.
 """
 
 import streamlit as st
+from streamlit_extras.metric_cards import style_metric_cards
+
 import pandas as pd
 import pygwalker as pyg
 from pygwalker.api.streamlit import StreamlitRenderer
