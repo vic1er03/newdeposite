@@ -1489,42 +1489,69 @@ def main():
                     # Extraire les caractéristiques du cluster idéal
                     ideal_profile = df_with_clusters[df_with_clusters['Cluster'] == ideal_cluster]
                     
-                    # Afficher les caractéristiques démographiques du cluster idéal
+                    # Layout avec deux colonnes
                     col1, col2 = st.columns(2)
                     
+                    # Colonne 1: Caractéristiques démographiques
                     with col1:
-                        st.write("**Caractéristiques démographiques:**")
+                        st.markdown("### **Caractéristiques démographiques**")
                         
+                        # Âge moyen
                         if 'Age' in ideal_profile.columns:
-                            st.write(f"- Âge moyen: {ideal_profile['Age'].mean():.1f} ans")
+                            st.metric(
+                                label="Âge moyen", 
+                                value=f"{ideal_profile['Age'].mean():.1f} ans", 
+                                delta=None, 
+                                help="Moyenne des âges dans le profil"
+                            )
                         
+                        # Genre
                         if 'Genre_' in ideal_profile.columns:
                             gender_pct = ideal_profile['Genre_'].value_counts(normalize=True) * 100
-                            st.write(f"- Genre: {gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes")
+                            st.metric(
+                                label="Genre", 
+                                value=f"{gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes", 
+                                delta=None, 
+                                help="Répartition des genres"
+                            )
                         
+                        # Niveau d'étude
                         if 'Niveau_d\'etude' in ideal_profile.columns:
                             top_edu = ideal_profile['Niveau_d\'etude'].value_counts(normalize=True).head(2)
-                            st.write("- Niveau d'études principal:")
                             for edu, pct in top_edu.items():
-                                st.write(f"  • {edu}: {pct*100:.1f}%")
+                                st.metric(
+                                    label=f"Niveau d'études: {edu}", 
+                                    value=f"{pct*100:.1f}%", 
+                                    delta=None, 
+                                    help="Pourcentage des niveaux d'études"
+                                )
                         
+                        # Situation matrimoniale
                         if 'Situation_Matrimoniale_(SM)' in ideal_profile.columns:
                             top_marital = ideal_profile['Situation_Matrimoniale_(SM)'].value_counts(normalize=True).head(2)
-                            st.write("- Situation matrimoniale principale:")
                             for status, pct in top_marital.items():
-                                st.write(f"  • {status}: {pct*100:.1f}%")
+                                st.metric(
+                                    label=f"Situation matrimoniale: {status}", 
+                                    value=f"{pct*100:.1f}%", 
+                                    delta=None, 
+                                    help="Répartition de la situation matrimoniale"
+                                )
                     
+                    # Colonne 2: Caractéristiques géographiques
                     with col2:
-                        st.write("**Caractéristiques géographiques:**")
+                        st.markdown("### **Caractéristiques géographiques**")
                         
-                        geo_columns = [col for col in ideal_profile.columns if any(term in col for term in 
-                                      ['Arrondissement', 'Quartier', 'Résidence'])]
-                        
+                        geo_columns = [col for col in ideal_profile.columns if any(term in col for term in ['Arrondissement', 'Quartier', 'Résidence'])]
                         for geo_col in geo_columns:
                             top_geo = ideal_profile[geo_col].value_counts(normalize=True).head(3)
-                            st.write(f"- {geo_col} principal:")
                             for zone, pct in top_geo.items():
-                                st.write(f"  • {zone}: {pct*100:.1f}%")
+                                st.metric(
+                                    label=f"{geo_col} principal: {zone}", 
+                                    value=f"{pct*100:.1f}%", 
+                                    delta=None, 
+                                    help="Répartition géographique"
+                                )
+
                     
                     # Créer un radar chart pour visualiser le profil idéal
                     if 'Age' in ideal_profile.columns and 'Taille_' in ideal_profile.columns and 'Poids' in ideal_profile.columns:
