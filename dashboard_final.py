@@ -1174,7 +1174,161 @@ def analyze_distributions(df, sheet_name):
                                         f"Count: {count} <br> Pourcentage: {value_counts_pct[val]:.1f}%</div>", unsafe_allow_html=True)
 
 
+def analyze_blood_groups(df):
+    """
+    Analyse la distribution des groupes sanguins et phénotypes.
+    """
+    if 'Groupe Sanguin ABO / Rhesus ' not in df.columns:
+        print("Les informations sur les groupes sanguins ne sont pas disponibles dans ce jeu de données.")
+        return
+    
+    print("\n### Analyse des groupes sanguins et phénotypes ###")
+    
+    # Distribution des groupes sanguins
+    blood_group_counts = df['Groupe Sanguin ABO / Rhesus '].value_counts()
+    blood_group_pct = df['Groupe Sanguin ABO / Rhesus '].value_counts(normalize=True) * 100
+    
+    # Créer un graphique interactif
+    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "bar"}, {"type": "pie"}]],
+                       subplot_titles=['Distribution des groupes sanguins (Barres)', 'Distribution des groupes sanguins (Camembert)'])
+    
+    # Définir une palette de couleurs pour les groupes sanguins
+    blood_colors = {
+        'O+': '#e41a1c',
+        'O-': '#ff7f00',
+        'A+': '#4daf4a',
+        'A-': '#984ea3',
+        'B+': '#377eb8',
+        'B-': '#ffff33',
+        'AB+': '#a65628',
+        'AB-': '#f781bf'
+    }
+    
+    # Assigner des couleurs aux groupes sanguins présents
+    colors = [blood_colors.get(group, '#999999') for group in blood_group_counts.index]
+    
+    # Graphique à barres
+    # Convertir en numérique en forçant les erreurs à NaN, puis arrondir
+    blood_group_pct_numeric = pd.to_numeric(blood_group_pct, errors='coerce').round(1)
+    
+    # Remplacer les NaN par une valeur par défaut (ex: 0)
+    blood_group_pct_numeric = blood_group_pct_numeric.fillna(0)
+    
+    # Convertir en string et ajouter '%'
+    text_labels = blood_group_pct_numeric.astype(str) + '%'
+    
+    # Appliquer au graphique
+    fig.add_trace(
+        go.Bar(x=blood_group_counts.index, y=blood_group_counts.values, 
+               text=text_labels,
+               textposition='outside',
+               marker_color=colors),
+        row=1, col=1
+    )
+
+    
+    # Graphique en camembert
+    fig.add_trace(
+        go.Pie(labels=blood_group_counts.index, values=blood_group_counts.values,
+              textinfo='label+percent',
+              insidetextorientation='radial',
+              marker=dict(colors=colors)),
+        row=1, col=2
+    )
+    
+    fig.update_layout(title='Distribution des groupes sanguins',
+                     height=500,
+                     showlegend=False)
+    
+    fig.update_xaxes(title_text="Groupe sanguin", row=1, col=1)
+    fig.update_yaxes(title_text="Nombre de donneurs", row=1, col=1)
+    
+    fig.show()
+    
+    # Analyser les phénotypes
+    if 'Phenotype ' in df.columns:
+        print("\nAnalyse des phénotypes:")
         
+        # Extraire les différents antigènes des phénotypes
+        phenotype_data = {}
+        
+        for phenotype in df['Phenotype '].dropna():
+            antigens = [antigen.strip() for antigen in phenotype.split(',')]
+            for antigen in antigens:
+                if antigen in phenotype_data:
+                    phenotype_data[antigen] += 1
+                else:
+                    phenotype_data[antigen] = 1
+        
+        # Convertir en DataFrame
+        phenotype_df = pd.DataFrame(list(phenotype_data.items()), columns=['Antigène', 'Fréquence'])
+        phenotype_df = phenotype_df.sort_values('Fréquence', ascending=False)
+        
+        # Calculer les pourcentages
+        total_donors = len(df['Phenotype '].dropna())
+        phenotype_df['Pourcentage'] = phenotype_df['Fréquence'] / total_donors * 100
+        
+        # Créer un graphique à barres
+        fig = px.bar(phenotype_df, 
+                    x='Antigène', 
+                    y='Pourcentage',
+                    title='Fréquence des antigènes dans la population de donneurs',
+                    color='Pourcentage',
+                    color_continuous_scale='Viridis',
+                    text='Fréquence')
+        
+        fig.update_layout(height=500,
+                         width=800,
+                         xaxis={'categoryorder': 'total descending'})
+        
+        fig.update_traces(textposition='outside')
+        
+        fig.show()
+        
+        # Analyser la relation entre groupe sanguin et phénotypes
+        print("\nRelation entre groupe sanguin et phénotypes:")
+        
+        # Créer un tableau croisé pour les antigènes les plus courants par groupe sanguin
+        top_antigens = phenotype_df.head(5)['Antigène'].tolist()
+        
+        # Préparer les données
+        antigen_by_group = {}
+        
+        for blood_group in blood_group_counts.index:
+            antigen_by_group[blood_group] = {}
+            for antigen in top_antigens:
+                count = 0
+                total = 0
+                
+                for idx, row in df[df['Groupe Sanguin ABO / Rhesus '] == blood_group].iterrows():
+                    if pd.notna(row['Phenotype ']):
+                        total += 1
+                        if antigen in row['Phenotype ']:
+                            count += 1
+                
+                if total > 0:
+                    antigen_by_group[blood_group][antigen] = count / total * 100
+                else:
+                    antigen_by_group[blood_group][antigen] = 0
+        
+        # Convertir en DataFrame
+        antigen_by_group_df = pd.DataFrame(antigen_by_group).T
+        
+        # Créer un heatmap
+        fig = px.imshow(antigen_by_group_df,
+                       labels=dict(x="Antigène", y="Groupe sanguin", color="Pourcentage (%)"),
+                       text_auto='.1f',
+                       aspect="auto",
+                       color_continuous_scale="Viridis")
+        
+        fig.update_layout(title='Fréquence des antigènes par groupe sanguin (%)',
+                         height=500,
+                         width=800)
+        
+        fig.show()
+
+# Analyser les groupes sanguins dans les données 2020
+analyze_blood_groups(df_2020)        
 
 
 # Interface principale du tableau de bord
@@ -1348,6 +1502,7 @@ def main():
         elif dataset== "2020":
             visualize_missing_values(df_2020, "Données 2020")
             analyze_distributions(df_2020, "Données 2020")
+            analyze_blood_groups(df_2020)
         else:
             visualize_missing_values(df_volontaire, "Données Volontaire")
             analyze_distributions(df_volontaire, "Données Volontaire")
