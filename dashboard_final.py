@@ -2165,144 +2165,142 @@ def main():
     # ==============================
         with tab3:
             # ==============================
-            # 🎯 CHARGEMENT DU MODÈLE & DONNÉES TEST
+            # 🎯 Chargement du modèle & données de test
             # ==============================
             @st.cache_resource
             def load_model():
-               pathse="eligibility_model.pkl"
-               data = joblib.load(pathse)
-               return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"],data["resultat"]
-
-            model, X_test, y_test, target_encoder, preprocessor,resultat = load_model()
-                # ==============================
-            # 📊 PERFORMANCE DU MODÈLE SUR DONNÉES TEST
+                pathse = "eligibility_model.pkl"
+                data = joblib.load(pathse)
+                return data["model"], data["X_test"], data["y_test"], data["target_encoder"], data["lpreprocessor"], data["resultat"]
+            
+            model, X_test, y_test, target_encoder, preprocessor, resultat = load_model()
+            
             # ==============================
-            st.subheader("📈 Performance du Modèle sur Données de Test")
-
-            # 🔮 Prédictions sur X_test
-            y_pred_proba = model.predict_proba(X_test)[:, 1]
+            # 📈 Évaluation du modèle
+            # ==============================
+            st.header("🧠 Évaluation du modèle de prédiction d'éligibilité")
+            
+            # 🔮 Prédictions
+            y_pred_proba = model.predict_proba(X_test)
             y_pred = model.predict(X_test)
-
-            # 📄 Rapport de Classification
-            st.subheader("📄 Rapport de Classification")
-            A=target_encoder.inverse_transform([0,1,2])
+            
+            # 📄 Rapport de classification
+            A = target_encoder.inverse_transform([0, 1, 2])
             report = classification_report(y_test, y_pred, target_names=A, output_dict=True)
             df_report = pd.DataFrame(report).transpose()
+            
+            # Résumé rapide avec les principales métriques
+            st.subheader("🔍 Résumé des performances")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Précision (macro)", f"{report['macro avg']['precision']:.2f}")
+            with col2:
+                st.metric("Recall (macro)", f"{report['macro avg']['recall']:.2f}")
+            with col3:
+                st.metric("F1-score (macro)", f"{report['macro avg']['f1-score']:.2f}")
+            
+            st.subheader("📋 Rapport complet")
             st.dataframe(df_report)
+            
+            st.subheader("📊 Résultats détaillés")
             st.dataframe(resultat)
             
-
-            # 🔄 Binarisation des étiquettes pour "One vs Rest" si multi-classe
-            n_classes = len(np.unique(y_test))  # Nombre de classes
-            y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))  # Transforme y_test en binaire
-            y_pred_proba = model.predict_proba(X_test)  # Probabilités prédites pour chaque classe
-
-            # 📈 Affichage de la courbe ROC pour chaque classe
-            st.subheader("📈 Courbe ROC (One vs Rest)")
-
+            # ==============================
+            # 📈 Courbe ROC (One vs Rest)
+            # ==============================
+            st.subheader("🧪 Courbe ROC par classe")
+            
+            n_classes = len(np.unique(y_test))
+            y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))
+            y_pred_proba_all = model.predict_proba(X_test)
+            
             fig, ax = plt.subplots(figsize=(7, 5))
-            colors = ['blue', 'red', 'green', 'purple', 'orange']  # Couleurs pour chaque classe
-
+            colors = ['blue', 'red', 'green', 'purple', 'orange']
+            
             for i in range(n_classes):
-                if n_classes > 2:  # Cas multi-classe
-                    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_pred_proba[:, i])
+                if n_classes > 2:
+                    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_pred_proba_all[:, i])
                     roc_auc = auc(fpr, tpr)
-                    ax.plot(fpr, tpr, color=colors[i % len(colors)], lw=2, label=f"Classe {A[i]} (AUC = {roc_auc:.2f})")
-                else:  # Cas binaire classique
-                    fpr, tpr, _ = roc_curve(y_test, y_pred_proba[:, 1])
+                    ax.plot(fpr, tpr, color=colors[i % len(colors)], lw=2,
+                            label=f"Classe {A[i]} (AUC = {roc_auc:.2f})")
+                else:
+                    fpr, tpr, _ = roc_curve(y_test, y_pred_proba_all[:, 1])
                     roc_auc = auc(fpr, tpr)
                     ax.plot(fpr, tpr, color="blue", lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
-
+            
             ax.plot([0, 1], [0, 1], color="gray", linestyle="--")
-            ax.set_xlabel("Taux de Faux Positifs (FPR)")
-            ax.set_ylabel("Taux de Vrais Positifs (TPR)")
-            ax.set_title("Courbe ROC par Classe")
+            ax.set_xlabel("Taux de Faux Positifs")
+            ax.set_ylabel("Taux de Vrais Positifs")
+            ax.set_title("Courbe ROC")
             ax.legend(loc="lower right")
             st.pyplot(fig)
-
             
-            # 📊 Matrice de Confusion
-            st.subheader("📊 Matrice de Confusion")
-            B=target_encoder.inverse_transform(y_test)
-            C=target_encoder.inverse_transform(y_pred)
+            # ==============================
+            # 🧱 Matrice de confusion
+            # ==============================
+            st.subheader("🔀 Matrice de confusion")
+            B = target_encoder.inverse_transform(y_test)
+            C = target_encoder.inverse_transform(y_pred)
             conf_matrix = confusion_matrix(B, C)
+            
             fig, ax = plt.subplots()
             sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
             ax.set_title("Matrice de Confusion")
             st.pyplot(fig)
-            # Afficher les probabilités
-            st.write("**Probabilités:**")
             
-            # Créer un DataFrame pour les probabilités
+            # ==============================
+            # 📊 Probabilités d'un exemple
+            # ==============================
+            st.subheader("📌 Probabilités pour un exemple")
             proba_df = pd.DataFrame({
                 'Statut': model.classes_,
                 'Probabilité': y_pred_proba[0]
             })
             
-            # Créer un graphique à barres pour les probabilités
-            fig = px.bar(
+            fig_proba = px.bar(
                 proba_df,
                 x='Statut',
                 y='Probabilité',
-                title="Probabilités pour chaque statut d'éligibilité",
-                labels={'Probabilité': 'Probabilité', 'Statut': "Statut d'éligibilité"}
+                title="Distribution des probabilités pour chaque classe",
+                labels={'Probabilité': 'Probabilité', 'Statut': 'Statut'}
             )
+            fig_proba.update_layout(height=400)
+            st.plotly_chart(fig_proba, use_container_width=True)
             
-            fig.update_layout(
-                xaxis_title="Statut d'éligibilité",
-                yaxis_title="Probabilité",
-                font=dict(size=12),
-                height=400
-            )
+            # ==============================
+            # 🧠 Importance des caractéristiques
+            # ==============================
+            if hasattr(model, 'feature_importances_'):
+                st.subheader("📊 Importance des caractéristiques")
             
-            st.plotly_chart(fig, use_container_width=True)
-
-            #if hasattr(model, 'feature_importances_'):
-            # Obtenir les noms des caractéristiques après one-hot encoding
-            feature_names = []
-            for name, transformer, features in preprocessor.transformers_:
-                if name == 'cat':
-                    # Pour les caractéristiques catégorielles, obtenir les noms après one-hot encoding
-                    for i, feature in enumerate(features):
-                        categories = transformer.named_steps['onehot'].categories_[i]
-                        for category in categories:
-                            feature_names.append(f"{feature}_{category}")
-                else:
-                    # Pour les caractéristiques numériques, conserver les noms d'origine
-                    feature_names.extend(features)
+                feature_names = []
+                for name, transformer, features in preprocessor.transformers_:
+                    if name == 'cat':
+                        for i, feature in enumerate(features):
+                            categories = transformer.named_steps['onehot'].categories_[i]
+                            for category in categories:
+                                feature_names.append(f"{feature}_{category}")
+                    else:
+                        feature_names.extend(features)
             
-            # Obtenir les importances des caractéristiques
-            importances = model.feature_importances_
+                importances = model.feature_importances_
+                if len(feature_names) == len(importances):
+                    importance_df = pd.DataFrame({
+                        'Feature': feature_names,
+                        'Importance': importances
+                    }).sort_values('Importance', ascending=False).head(15)
             
-            # Créer un DataFrame pour les importances
-            if len(feature_names) == len(importances):
-                importance_df = pd.DataFrame({
-                    'Feature': feature_names,
-                    'Importance': importances
-                })
-                
-                # Trier par importance décroissante
-                importance_df = importance_df.sort_values('Importance', ascending=False).head(15)
-                
-                # Créer un graphique des importances
-                fig_importance = px.bar(
-                    importance_df,
-                    x='Importance',
-                    y='Feature',
-                    orientation='h',
-                    title="Importance des caractéristiques pour la prédiction d'éligibilité",
-                    labels={'Importance': 'Importance relative', 'Feature': 'Caractéristique'}
-                )
-                
-                fig_importance.update_layout(
-                    xaxis_title="Importance relative",
-                    yaxis_title="Caractéristique",
-                    font=dict(size=12),
-                    height=600
-                )
-            st.plotly_chart(fig_importance)
-           
-                    
+                    fig_importance = px.bar(
+                        importance_df,
+                        x='Importance',
+                        y='Feature',
+                        orientation='h',
+                        title="Top 15 caractéristiques les plus importantes",
+                        labels={'Importance': 'Importance relative', 'Feature': 'Caractéristique'}
+                    )
+                    fig_importance.update_layout(height=600)
+                    st.plotly_chart(fig_importance, use_container_width=True)
+       
                     
     
     # Pied de page
