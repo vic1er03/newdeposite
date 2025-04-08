@@ -349,81 +349,82 @@ def analyze_categorical_relationships(df, sheet_name):
                 break
 
         if target_column:
-            # Affichage de la variable cible détectée
             st.markdown(
                 f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
                 f"<strong>Variable cible détectée : {target_column}</strong><i class='fa fa-bullseye' style='margin-left: 10px;'></i></div>",
                 unsafe_allow_html=True
             )
-            
+
+            # Initialisation pour les stats générales
+            total_tests = 0
+            nb_significatives = 0
+            p_values = []
+            relations = []
+
+            # Parcours des relations
             for col in valid_columns:
                 if col != target_column:
-                    # Calcul du test du chi2
+                    contingency = pd.crosstab(df[target_column], df[col])
+                    chi2, p, dof, expected = stats.chi2_contingency(contingency)
+
+                    total_tests += 1
+                    p_values.append(p)
+                    if p < 0.05:
+                        nb_significatives += 1
+                    relations.append((p, col))
+
+            # Métriques résumées en haut
+            relation_mini = min(relations, key=lambda x: x[0]) if relations else (None, None)
+
+            col1, col2, col3, col4, col5 = st.columns(5)
+            col1.metric("Total de tests", total_tests)
+            col2.metric("Relations significatives", nb_significatives)
+            col3.metric("p-value moyenne", f"{sum(p_values)/len(p_values):.4f}" if p_values else "N/A")
+            col4.metric("p-value min", f"{relation_mini[0]:.4f}" if relation_mini[0] is not None else "N/A")
+            col5.metric("Relation la + significative", f"{target_column} vs {relation_mini[1]}" if relation_mini[1] else "N/A")
+
+            # Affichage détaillé des relations
+            for col in valid_columns:
+                if col != target_column:
                     contingency = pd.crosstab(df[target_column], df[col])
                     chi2, p, dof, expected = stats.chi2_contingency(contingency)
                     association = "✅ significative" if p < 0.05 else "❌ non significative"
-                    
-                    # Bloc titre et icône
+
                     st.markdown(
                         f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
                         f"<strong>Relation entre `{target_column}` et `{col}`</strong><i class='fa fa-exchange' style='margin-left: 10px;'></i></div>",
                         unsafe_allow_html=True
                     )
-                    
-                    # Bloc valeur pour le test du chi2
+
                     st.markdown(
                         f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
                         f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
                         unsafe_allow_html=True
                     )
-                    
-                    # Graphique en barres
-                    contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
-                    fig = px.bar(contingency_pct, 
-                                 barmode='stack',
-                                 title=f"{target_column} vs {col} (p={p:.4f})",
-                                 labels={'value': 'Pourcentage (%)', 'index': target_column})
-                    fig.update_layout(template='plotly_white')
-                    st.plotly_chart(fig)
 
-                    # Graphique en mosaïque
-                    with st.expander(f"Graphique en mosaïque pour {target_column} vs {col}"):
-                        fig_mosaic, ax = plt.subplots(figsize=(8, 6))
+                    # Disposition des deux graphiques côte à côte
+                    col_g1, col_g2 = st.columns(2)
+
+                    with col_g1:
+                        contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
+                        fig_bar = px.bar(contingency_pct,
+                                         barmode='stack',
+                                         title=f"{target_column} vs {col} (p={p:.4f})",
+                                         labels={'value': 'Pourcentage (%)', 'index': target_column})
+                        fig_bar.update_layout(template='plotly_white')
+                        st.plotly_chart(fig_bar)
+
+                    with col_g2:
+                        fig_mosaic, ax = plt.subplots(figsize=(6, 5))
                         mosaic_data = {(i, j): contingency.loc[i, j] for i in contingency.index for j in contingency.columns}
                         mosaic(mosaic_data, ax=ax, title=f'{target_column} vs {col}')
                         st.pyplot(fig_mosaic)
 
         else:
-            # Aucune variable cible claire
-            st.warning("Aucune variable cible claire trouvée. Affichage de quelques relations aléatoires entre variables.")
-            for col1, col2 in zip(valid_columns, valid_columns[1:3]):
-                contingency = pd.crosstab(df[col1], df[col2])
-                chi2, p, dof, expected = stats.chi2_contingency(contingency)
-                association = "✅ significative" if p < 0.05 else "❌ non significative"
-
-                # Bloc titre et icône
-                st.markdown(
-                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
-                    f"<strong>Relation entre `{col1}` et `{col2}`</strong><i class='fa fa-exchange' style='margin-left: 10px;'></i></div>",
-                    unsafe_allow_html=True
-                )
-                
-                # Bloc valeur pour le test du chi2
-                st.markdown(
-                    f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
-                    f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
-                    unsafe_allow_html=True
-                )
-
-                # Graphique en couleur continue
-                fig = px.imshow(contingency,
-                                text_auto=True,
-                                aspect="auto",
-                                color_continuous_scale="Viridis")
-                fig.update_layout(title=f"{col1} vs {col2} (p={p:.4f})")
-                st.plotly_chart(fig)
+            st.warning("Aucune variable cible claire trouvée.")
     else:
         st.warning("Pas assez de variables catégorielles valides pour analyser les relations.")
+
 
 # Fonction pour créer un graphique de clustering des donneurs
 @st.cache_data
