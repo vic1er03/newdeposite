@@ -1369,24 +1369,24 @@ def main():
             st.plotly_chart(fig_pie, use_container_width=True)
     
             st.markdown("---")
-            # =============================
-            # 🎛️ Table de mixage
-            # =============================
-            st.subheader("🎚️ Tableau de Contrôle Interactif")
-            col3, col4, col5 = st.columns(3)
-            with col3:
-                freq = st.slider("🩺 Fréquence des dons", min_value=0, max_value=10, value=6)
-            with col4:
-                retention = st.slider("📅 Fidélité", min_value=0, max_value=100, value=45)
-            with col5:
-                satisfaction = st.slider("😊 Satisfaction", min_value=0, max_value=100, value=80)
-        
-            score_mix = (freq * 10 + retention + satisfaction) / 3
-            st.markdown(f"<h3 style='color:#29d8db;'>Score global d'engagement : {score_mix:.1f}%</h3>", unsafe_allow_html=True)
-        
-            # =============================
-            # 🚘 Écran de voiture & 🫀 Cardiogramme (visuels)
-            # =============================
+        # =============================
+        # 🎛️ Table de mixage
+        # =============================
+        st.subheader("🎚️ Tableau de Contrôle Interactif")
+        col3, col4, col5 = st.columns(3)
+        with col3:
+            freq = st.slider("🩺 Fréquence des dons", min_value=0, max_value=10, value=6)
+        with col4:
+            retention = st.slider("📅 Fidélité", min_value=0, max_value=100, value=45)
+        with col5:
+            satisfaction = st.slider("😊 Satisfaction", min_value=0, max_value=100, value=80)
+    
+        score_mix = (freq * 10 + retention + satisfaction) / 3
+        st.markdown(f"<h3 style='color:#29d8db;'>Score global d'engagement : {score_mix:.1f}%</h3>", unsafe_allow_html=True)
+    
+        # =============================
+        # 🚘 Écran de voiture & 🫀 Cardiogramme (visuels)
+        # =============================
         col6, col7 = st.columns(2)
         with col6:
             st.subheader("🚘 Vue 'dashboard' – Style voiture")
