@@ -349,28 +349,44 @@ def analyze_categorical_relationships(df, sheet_name):
                 break
 
         if target_column:
-            st.info(f"Variable cible détectée : **{target_column}**")
+            # Affichage de la variable cible détectée
+            st.markdown(
+                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                f"<strong>Variable cible détectée : {target_column}</strong><i class='fa fa-bullseye' style='margin-left: 10px;'></i></div>",
+                unsafe_allow_html=True
+            )
+            
             for col in valid_columns:
                 if col != target_column:
+                    # Calcul du test du chi2
                     contingency = pd.crosstab(df[target_column], df[col])
                     chi2, p, dof, expected = stats.chi2_contingency(contingency)
                     association = "✅ significative" if p < 0.05 else "❌ non significative"
                     
-                    st.markdown(f"**Relation entre `{target_column}` et `{col}`**")
-                    st.write(f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}")
+                    # Bloc titre et icône
+                    st.markdown(
+                        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                        f"<strong>Relation entre `{target_column}` et `{col}`</strong><i class='fa fa-exchange' style='margin-left: 10px;'></i></div>",
+                        unsafe_allow_html=True
+                    )
                     
+                    # Bloc valeur pour le test du chi2
+                    st.markdown(
+                        f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                        f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
+                        unsafe_allow_html=True
+                    )
+                    
+                    # Graphique en barres
                     contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
                     fig = px.bar(contingency_pct, 
                                  barmode='stack',
                                  title=f"{target_column} vs {col} (p={p:.4f})",
                                  labels={'value': 'Pourcentage (%)', 'index': target_column})
-                    
-                    # Afficher automatiquement les textes sur les barres
-                    #fig.update_traces(texttemplate='%{text:.1f}%', textposition='inside')
-                    
                     fig.update_layout(template='plotly_white')
                     st.plotly_chart(fig)
 
+                    # Graphique en mosaïque
                     with st.expander(f"Graphique en mosaïque pour {target_column} vs {col}"):
                         fig_mosaic, ax = plt.subplots(figsize=(8, 6))
                         mosaic_data = {(i, j): contingency.loc[i, j] for i in contingency.index for j in contingency.columns}
@@ -378,15 +394,28 @@ def analyze_categorical_relationships(df, sheet_name):
                         st.pyplot(fig_mosaic)
 
         else:
+            # Aucune variable cible claire
             st.warning("Aucune variable cible claire trouvée. Affichage de quelques relations aléatoires entre variables.")
             for col1, col2 in zip(valid_columns, valid_columns[1:3]):
                 contingency = pd.crosstab(df[col1], df[col2])
                 chi2, p, dof, expected = stats.chi2_contingency(contingency)
                 association = "✅ significative" if p < 0.05 else "❌ non significative"
 
-                st.markdown(f"**Relation entre `{col1}` et `{col2}`**")
-                st.write(f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}")
+                # Bloc titre et icône
+                st.markdown(
+                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                    f"<strong>Relation entre `{col1}` et `{col2}`</strong><i class='fa fa-exchange' style='margin-left: 10px;'></i></div>",
+                    unsafe_allow_html=True
+                )
+                
+                # Bloc valeur pour le test du chi2
+                st.markdown(
+                    f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                    f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
+                    unsafe_allow_html=True
+                )
 
+                # Graphique en couleur continue
                 fig = px.imshow(contingency,
                                 text_auto=True,
                                 aspect="auto",
@@ -395,7 +424,6 @@ def analyze_categorical_relationships(df, sheet_name):
                 st.plotly_chart(fig)
     else:
         st.warning("Pas assez de variables catégorielles valides pour analyser les relations.")
-
 
 # Fonction pour créer un graphique de clustering des donneurs
 @st.cache_data
@@ -612,6 +640,7 @@ def create_donor_retention_analysis(df):
     """
     Crée des visualisations pour analyser la fidélisation des donneurs.
     """
+    df=df_2019 if dataset=="2019" else (df=df_2020 if dataset=="2020" else df=df_Volontaire)
     # Vérifier si la colonne indiquant si le donneur a déjà donné est disponible
     if 'A-t-il_(elle)_déjà_donné_le_sang_' in df.columns:
         # Compter le nombre de donneurs qui ont déjà donné et ceux qui n'ont pas donné
