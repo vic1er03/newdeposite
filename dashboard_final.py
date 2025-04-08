@@ -640,7 +640,7 @@ def create_donor_retention_analysis(df):
     """
     Crée des visualisations pour analyser la fidélisation des donneurs.
     """
-    df=df_2019 if dataset=="2019" else (df=df_2020 if dataset=="2020" else df=df_Volontaire)
+    #df=df_2019 if dataset=="2019" else (df=df_2020 if dataset=="2020" else df=df_Volontaire)
     # Vérifier si la colonne indiquant si le donneur a déjà donné est disponible
     if 'A-t-il_(elle)_déjà_donné_le_sang_' in df.columns:
         # Compter le nombre de donneurs qui ont déjà donné et ceux qui n'ont pas donné
@@ -1693,7 +1693,13 @@ def main():
         image = Image.open(image_file)
         st.image(image, use_container_width=True)  # ✅ remplace use_column_width     
         st.header("🔄 Fidélisation des donneurs")
-        
+
+        if dataset == "2019":
+            df=df_2019
+        elif dataset == "2020" :
+            df=df_2020
+        else :
+            df=df_volontaire
         # Créer des visualisations pour l'analyse de fidélisation
         retention_fig, demographic_figs = create_donor_retention_analysis(df)
         
