@@ -18,6 +18,7 @@ from plotly.subplots import make_subplots
 import folium
 from folium.plugins import MarkerCluster, HeatMap
 from streamlit_option_menu import option_menu
+from matplotlib.gridspec import GridSpec
 
 from streamlit_folium import folium_static
 import geopandas as gpd
@@ -533,167 +534,74 @@ def create_donor_clustering(df):
 @st.cache_data
 def create_campaign_analysis(df):
     """
-    Crée des visualisations pour analyser l'efficacité des campagnes de don avec des analyses complémentaires.
+    Crée des visualisations matplotlib (heatmap, barplots, line) pour analyser les dons de sang sur l'année 2019.
     """
-    # Identifier les colonnes de date
-    date_columns = [col for col in df.columns if 'date' in col.lower()]
-    
-    # Sélectionner une colonne de date appropriée
-    selected_date_col = None
-    for col in date_columns:
-        if df[col].notna().sum() > 100:  # Vérifier qu'il y a suffisamment de données
-            selected_date_col = col
-            break
-    
-    if selected_date_col:
-        # Créer une copie du DataFrame avec la colonne de date
-        df_temp = df.copy()
-        
-        # Convertir en datetime si ce n'est pas déjà fait
-        df_temp[selected_date_col] = pd.to_datetime(df_temp[selected_date_col], errors='coerce')
-        
-        # Extraire l'année et le mois
-        df_temp['year'] = df_temp[selected_date_col].dt.year
-        df_temp['month'] = df_temp[selected_date_col].dt.month
-        df_temp['year_month'] = df_temp[selected_date_col].dt.to_period('M')
-        
-        # Compter le nombre de donneurs par mois
-        monthly_counts = df_temp.groupby('year_month').size().reset_index(name='count')
-        monthly_counts['year_month_str'] = monthly_counts['year_month'].astype(str)
-        
-        # Créer un graphique de tendance temporelle
-        fig1 = px.line(
-            monthly_counts,
-            x='year_month_str',
-            y='count',
-            markers=True,
-            title=f"Évolution du nombre de donneurs au fil du temps (basé sur {selected_date_col})",
-            labels={'count': 'Nombre de donneurs', 'year_month_str': 'Année-Mois'}
-        )
-        
-        # Personnaliser le graphique
-        fig1.update_layout(
-            xaxis_title="Période",
-            yaxis_title="Nombre de donneurs",
-            font=dict(size=12),
-            height=500
-        )
-        
-        # Analyser les tendances par caractéristiques démographiques
-        demographic_figs = []
-        
-        # Analyser par genre si disponible
-        if 'Genre_' in df_temp.columns:
-            gender_monthly = df_temp.groupby(['year_month', 'Genre_']).size().reset_index(name='count')
-            gender_monthly['year_month_str'] = gender_monthly['year_month'].astype(str)
-            
-            fig_gender = px.line(
-                gender_monthly,
-                x='year_month_str',
-                y='count',
-                color='Genre_',
-                markers=True,
-                title="Évolution du nombre de donneurs par genre",
-                labels={'count': 'Nombre de donneurs', 'year_month_str': 'Année-Mois', 'Genre_': 'Genre'}
-            )
-            
-            fig_gender.update_layout(
-                xaxis_title="Période",
-                yaxis_title="Nombre de donneurs",
-                legend_title="Genre",
-                font=dict(size=12),
-                height=400
-            )
-            
-            demographic_figs.append(fig_gender)
-        
-        # Analyser par niveau d'études si disponible
-        if 'Niveau_d\'etude' in df_temp.columns:
-            # Simplifier les catégories pour une meilleure lisibilité
-            df_temp['Niveau_simplifié'] = df_temp['Niveau_d\'etude'].apply(
-                lambda x: 'Universitaire' if 'Universitaire' in str(x) 
-                else ('Secondaire' if 'Secondaire' in str(x)
-                     else ('Primaire' if 'Primaire' in str(x)
-                          else ('Aucun' if 'Aucun' in str(x) else 'Non précisé')))
-            )
-            
-            edu_monthly = df_temp.groupby(['year_month', 'Niveau_simplifié']).size().reset_index(name='count')
-            edu_monthly['year_month_str'] = edu_monthly['year_month'].astype(str)
-            
-            fig_edu = px.line(
-                edu_monthly,
-                x='year_month_str',
-                y='count',
-                color='Niveau_simplifié',
-                markers=True,
-                title="Évolution du nombre de donneurs par niveau d'études",
-                labels={'count': 'Nombre de donneurs', 'year_month_str': 'Année-Mois', 'Niveau_simplifié': "Niveau d'études"}
-            )
-            
-            fig_edu.update_layout(
-                xaxis_title="Période",
-                yaxis_title="Nombre de donneurs",
-                legend_title="Niveau d'études",
-                font=dict(size=12),
-                height=400
-            )
-            
-            demographic_figs.append(fig_edu)
-        
-        # Ajouter une analyse de l'âge des donneurs (si disponible)
-        if 'Age' in df_temp.columns:
-            # Créer des tranches d'âge pour simplifier l'analyse
-            bins = [0, 18, 30, 40, 50, 60, 100]
-            labels = ['0-18', '19-30', '31-40', '41-50', '51-60', '60+']
-            df_temp['Age_group'] = pd.cut(df_temp['Age'], bins=bins, labels=labels)
-            
-            age_monthly = df_temp.groupby(['year_month', 'Age_group']).size().reset_index(name='count')
-            age_monthly['year_month_str'] = age_monthly['year_month'].astype(str)
-            
-            fig_age = px.line(
-                age_monthly,
-                x='year_month_str',
-                y='count',
-                color='Age_group',
-                markers=True,
-                title="Évolution du nombre de donneurs par groupe d'âge",
-                labels={'count': 'Nombre de donneurs', 'year_month_str': 'Année-Mois', 'Age_group': 'Tranche d\'âge'}
-            )
-            
-            fig_age.update_layout(
-                xaxis_title="Période",
-                yaxis_title="Nombre de donneurs",
-                legend_title="Tranche d'âge",
-                font=dict(size=12),
-                height=400
-            )
-            
-            demographic_figs.append(fig_age)
-        
-        # Ajouter un graphique de heatmap pour visualiser les jours de la semaine et mois
-        if 'jour_semaine' in df_temp.columns:
-            heatmap_data = df_temp.groupby(['jour_semaine', 'month']).size().reset_index(name='count')
-            heatmap = px.density_heatmap(
-                heatmap_data,
-                x='month',
-                y='jour_semaine',
-                z='count',
-                title="Heatmap du nombre de donneurs par mois et jour de la semaine",
-                labels={'jour_semaine': 'Jour de la semaine', 'month': 'Mois', 'count': 'Nombre de donneurs'}
-            )
-            
-            heatmap.update_layout(
-                xaxis_title="Mois",
-                yaxis_title="Jour de la semaine",
-                font=dict(size=12),
-                height=400
-            )
-            
-            demographic_figs.append(heatmap)
-        
-        return fig1, demographic_figs
-    else:
-        return None, []
+    st.subheader("📊 Analyse des Dons de Sang – Année 2019")
+
+    df = df.copy()
+
+    # Nettoyage et formatage des dates de don
+    df['Date_de_remplissage_de_la_fiche'] = pd.to_datetime(df['Date_de_remplissage_de_la_fiche'], errors='coerce')
+    df = df.dropna(subset=['Date_de_remplissage_de_la_fiche'])
+
+    # Extraire les informations temporelles utiles
+    df["Année"] = df["Date_de_remplissage_de_la_fiche"].dt.year
+    df["Mois"] = df["Date_de_remplissage_de_la_fiche"].dt.month
+    df["Jour"] = df["Date_de_remplissage_de_la_fiche"].dt.day
+    df["Jour de la semaine"] = df["Date_de_remplissage_de_la_fiche"].dt.dayofweek  # 0 = Lundi, 6 = Dimanche
+    df["Mois_Nom"] = df["Mois"].apply(lambda m: calendar.month_name[m])
+
+    fig = plt.figure(figsize=(20, 16))
+    gs = GridSpec(2, 2, figure=fig)
+
+    # 1. Carte thermique des dons par jour et mois
+    ax1 = fig.add_subplot(gs[0, 0])
+    heatmap_data = df.pivot_table(index="Jour de la semaine", columns="Mois", values="Date_de_remplissage_de_la_fiche", aggfunc="count")
+    heatmap_data.index = [calendar.day_name[i] for i in heatmap_data.index]
+    heatmap_data.columns = [calendar.month_name[int(col)] for col in heatmap_data.columns]
+    sns.heatmap(heatmap_data, cmap="coolwarm", annot=True, fmt=".0f", linewidths=0.5, linecolor="black", ax=ax1)
+    ax1.set_title("Carte thermique des dons par jour et mois", fontsize=14, fontweight='bold')
+    ax1.set_xlabel("Mois")
+    ax1.set_ylabel("Jour de la semaine")
+    ax1.tick_params(axis='x', rotation=20)
+    ax1.tick_params(axis='y', rotation=0)
+
+    # 2. Distribution des dons par mois
+    ax2 = fig.add_subplot(gs[0, 1])
+    monthly_counts = df.groupby("Mois_Nom")["Date_de_remplissage_de_la_fiche"].count()
+    month_order = [calendar.month_name[i] for i in range(1, 13) if calendar.month_name[i] in monthly_counts.index]
+    monthly_counts = monthly_counts.reindex(month_order)
+    monthly_counts.plot(kind='bar', color='skyblue', ax=ax2)
+    ax2.set_title("Distribution des dons par mois", fontsize=14, fontweight='bold')
+    ax2.set_xlabel("Mois")
+    ax2.set_ylabel("Nombre de dons")
+    ax2.tick_params(axis='x', rotation=45)
+
+    # 3. Distribution des dons par jour de la semaine
+    ax3 = fig.add_subplot(gs[1, 0])
+    weekday_counts = df.groupby("Jour de la semaine")["Date_de_remplissage_de_la_fiche"].count()
+    weekday_names = [calendar.day_name[i] for i in range(7)]
+    weekday_counts.index = [weekday_names[i] for i in weekday_counts.index]
+    weekday_counts.plot(kind='bar', color='lightgreen', ax=ax3)
+    ax3.set_title("Distribution des dons par jour de la semaine", fontsize=14, fontweight='bold')
+    ax3.set_xlabel("Jour")
+    ax3.set_ylabel("Nombre de dons")
+    ax3.tick_params(axis='x', rotation=45)
+
+    # 4. Tendance des dons au fil du temps
+    ax4 = fig.add_subplot(gs[1, 1])
+    time_series = df.groupby(pd.Grouper(key="Date_de_remplissage_de_la_fiche", freq='M')).size()
+    time_series.plot(marker='o', linestyle='-', ax=ax4)
+    ax4.set_title("Tendance des dons au fil du temps", fontsize=14, fontweight='bold')
+    ax4.set_xlabel("Date")
+    ax4.set_ylabel("Nombre de dons")
+    ax4.grid(True, linestyle='--', alpha=0.7)
+
+    plt.suptitle("Analyse des Dons de Sang – 2019", fontsize=20, fontweight='bold', y=0.98)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+
+    st.pyplot(fig)
+    st.info("Cette analyse est basée sur la colonne 'Date_de_remplissage_de_la_fiche'.")
 
 # Fonction pour créer une analyse de fidélisation des donneurs
 @st.cache_data
@@ -1984,22 +1892,12 @@ def main():
             st.warning("Impossible d'effectuer le clustering car il n'y a pas assez de variables numériques dans les données.")
     
     elif page == "Analyse des campagnes":
-        st.header("📈 Analyse des campagnes de don")
-        
-        # Créer des visualisations pour l'analyse des campagnes
-        campaign_fig, demographic_figs = create_campaign_analysis(df)
-        
-        if campaign_fig is not None:
-            # Afficher la tendance temporelle générale
-            st.subheader("Évolution du nombre de donneurs au fil du temps")
-            st.plotly_chart(campaign_fig, use_container_width=True)
-            
-            # Afficher les tendances par caractéristiques démographiques
-            if demographic_figs:
-                st.subheader("Tendances par caractéristiques démographiques")
-                
-                for fig in demographic_figs:
-                    st.plotly_chart(fig, use_container_width=True)
+            if dataset=="2019":
+                create_campaign_analysis(df_2019)
+            elif dataset=="2020":
+                create_campaign_analysis(df_2020)
+            else:
+                create_campaign_analysis(df_volontaire)
             
             # Ajouter des recommandations pour l'optimisation des campagnes
             st.subheader("Recommandations pour l'optimisation des campagnes")
