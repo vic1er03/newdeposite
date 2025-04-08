@@ -1161,73 +1161,101 @@ def main():
    
     # === Logique d'affichage par page ===
     if page == "Accueil":
-        # Image de couverture
-        image_file = "Image_sang.jpg"
-        try:
-            image = Image.open(image_file)
-            st.image(image, use_container_width=True)
-        except:
-            st.warning("Image non trouvée ou erreur de chargement.")
-        
-        # Titre et description
-        st.markdown('<h1 style="color:#D1001C;">🩸 Tableau de Bord d\'Analyse des Donneurs de Sang</h1>', unsafe_allow_html=True)
         st.markdown("""
-        <p style="font-size:18px;">
-        Ce tableau de bord interactif présente une <strong>analyse approfondie des données des donneurs de sang</strong>,
-        permettant d’optimiser les campagnes de don et d’améliorer la gestion des donneurs à l’échelle nationale.
-        </p>
+            <style>
+            .block-container {
+                padding: 2rem;
+            }
+            .card {
+                background-color: #0a0f3c;
+                padding: 1rem;
+                border-radius: 15px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                color: white;
+            }
+            .centered {
+                text-align: center;
+            }
+            </style>
         """, unsafe_allow_html=True)
     
-        # =====================
-        # 📍 Carte interactive du Cameroun avec cercles
-        # =====================
-        st.subheader("📍 Répartition géographique des dons (simulation)")
-        cameroon_coords = {
-            'Centre': (3.848, 11.502),
-            'Littoral': (4.05, 9.7),
-            'Nord-Ouest': (6.25, 10.26),
-            'Ouest': (5.49, 10.42),
-            'Adamaoua': (7.3, 13.58)
-        }
-        region_data = pd.DataFrame({
-            'Region': list(cameroon_coords.keys()),
-            'Lat': [v[0] for v in cameroon_coords.values()],
-            'Lon': [v[1] for v in cameroon_coords.values()],
-            'Dons': [150, 300, 90, 120, 180]  # Valeurs fictives
-        })
-        fig_map = px.scatter_mapbox(region_data, lat='Lat', lon='Lon', size='Dons', color='Region',
-                                    hover_name='Region', zoom=5.5, height=500,
-                                    mapbox_style="carto-positron")
-        st.plotly_chart(fig_map, use_container_width=True)
+        # Titre principal
+        st.markdown('''<h1 class="centered" style="color:#ffffff;">🩸 Tableau de Bord d'Analyse des Donneurs de Sang</h1>''', unsafe_allow_html=True)
+        st.markdown('<p class="centered" style="font-size:18px; color:#b0b0b0;">Optimisation des campagnes de don et visualisation des données médicales</p>', unsafe_allow_html=True)
+        
     
-        # =====================
-        # 📈 Graphique animé (simulation d'évolution des dons)
-        # =====================
-        st.subheader("📈 Évolution des dons par région (simulation)")
-        animation_data = pd.DataFrame({
-            "Année": [2019, 2020, 2021, 2022, 2023]*5,
-            "Région": sum([[r]*5 for r in cameroon_coords.keys()], []),
-            "Dons": [100, 120, 130, 150, 160, 220, 250, 270, 300, 320, 70, 80, 85, 90, 95, 100, 110, 115, 120, 130, 130, 150, 160, 170, 180]
-        })
-        fig_anim = px.bar(animation_data, x="Région", y="Dons", animation_frame="Année", color="Région",
-                          range_y=[0, 350], height=500)
-        st.plotly_chart(fig_anim, use_container_width=True)
+        # =============================
+        # 🔄 Layout global du tableau de bord (grille visuelle)
+        # =============================
+        col1, col2 = st.columns([2, 1])
     
-        # =====================
-        # 🎛️ Effet table de mixage avec sliders stylisés
-        # =====================
-        st.subheader("🎛️ Contrôle interactif – 'Table de Mixage des Indicateurs'")
-        col1, col2, col3 = st.columns(3)
         with col1:
-            freq = st.slider("🩺 Fréquence des dons", min_value=0, max_value=10, value=5)
-        with col2:
-            retention = st.slider("📅 Fidélité", min_value=0, max_value=100, value=50)
-        with col3:
-            satisfaction = st.slider("😊 Satisfaction", min_value=0, max_value=100, value=75)
+            # Carte du Cameroun avec cercles
+            st.subheader("📍 Répartition géographique des dons")
+            cameroon_coords = {
+                'Centre': (3.848, 11.502),
+                'Littoral': (4.05, 9.7),
+                'Nord-Ouest': (6.25, 10.26),
+                'Ouest': (5.49, 10.42),
+                'Adamaoua': (7.3, 13.58)
+            }
+            region_data = pd.DataFrame({
+                'Region': list(cameroon_coords.keys()),
+                'Lat': [v[0] for v in cameroon_coords.values()],
+                'Lon': [v[1] for v in cameroon_coords.values()],
+                'Dons': [150, 300, 90, 120, 180]
+            })
+            fig_map = px.scatter_mapbox(region_data, lat='Lat', lon='Lon', size='Dons', color='Region',
+                                        hover_name='Region', zoom=5.5, height=400, mapbox_style="carto-positron")
+            st.plotly_chart(fig_map, use_container_width=True)
     
-        # Affichage du mixage en pourcentage global (indicatif)
-        mix_score = (freq * 10 + retention + satisfaction) / 3
-        st.markdown(f"<h3 style='color:#D1001C;'>🎚️ Score global d'engagement : {mix_score:.1f} %</h3>", unsafe_allow_html=True)
+        with col2:
+            # Cercle de répartition (Pie Chart)
+            st.subheader("🔘 Type de donneurs (simulation)")
+            pie_data = pd.DataFrame({
+                "Type": ["Volontaire", "Familial", "Rémunéré"],
+                "Pourcentage": [58, 22, 20]
+            })
+            fig_pie = px.pie(pie_data, values='Pourcentage', names='Type',
+                             color_discrete_sequence=px.colors.sequential.RdBu,
+                             hole=0.4)
+            st.plotly_chart(fig_pie, use_container_width=True)
+    
+            st.markdown("---")
+            # =============================
+            # 🎛️ Table de mixage
+            # =============================
+            st.subheader("🎚️ Tableau de Contrôle Interactif")
+            col3, col4, col5 = st.columns(3)
+            with col3:
+                freq = st.slider("🩺 Fréquence des dons", min_value=0, max_value=10, value=6)
+            with col4:
+                retention = st.slider("📅 Fidélité", min_value=0, max_value=100, value=45)
+            with col5:
+                satisfaction = st.slider("😊 Satisfaction", min_value=0, max_value=100, value=80)
+        
+            score_mix = (freq * 10 + retention + satisfaction) / 3
+            st.markdown(f"<h3 style='color:#29d8db;'>Score global d'engagement : {score_mix:.1f}%</h3>", unsafe_allow_html=True)
+        
+            # =============================
+            # 🚘 Écran de voiture & 🫀 Cardiogramme (visuels)
+            # =============================
+            col6, col7 = st.columns(2)
+            with col6:
+                st.subheader("🚘 Vue 'dashboard' – Style voiture")
+                st.image("https://cdn-icons-png.flaticon.com/512/2504/2504929.png", width=300, caption="Tableau de bord de suivi")
+            with col7:
+                st.subheader("🫀 Visualisation médicale – Cardiogramme")
+                cardiogramme = np.sin(np.linspace(0, 20, 200)) * np.exp(-0.05 * np.linspace(0, 20, 200))
+                fig_cardio, ax = plt.subplots()
+                ax.plot(cardiogramme, color="red")
+                ax.set_title("Simulation d'un signal cardiaque")
+                ax.set_xticks([])
+                ax.set_yticks([])
+                st.pyplot(fig_cardio)
+        
+            st.markdown("---")
+            st.markdown("<p style='text-align:center; color:#808080;'>© 2025 Plateforme d'analyse des dons de sang</p>", unsafe_allow_html=True)
 
 # Tu peux ensuite continuer à ajouter les autres blocs : Aperçu des données, Distribution, etc.
 
