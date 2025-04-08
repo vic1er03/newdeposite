@@ -1047,38 +1047,59 @@ def analyze_distributions(df, sheet_name):
         if len(categorical_columns) > 0:
             st.subheader("📊 Variables catégorielles")
             selected_categorical = list(categorical_columns)[:min(5, len(categorical_columns))]
-    
+        
             for col in selected_categorical:
                 value_counts = df[col].value_counts()
                 value_counts_pct = df[col].value_counts(normalize=True) * 100
-    
+        
                 if len(value_counts) > 10:
                     top_n = value_counts.nlargest(9)
                     others = pd.Series({'Autres': value_counts.iloc[9:].sum()})
                     value_counts = pd.concat([top_n, others])
-    
+        
                     top_n_pct = value_counts_pct.nlargest(9)
                     others_pct = pd.Series({'Autres': value_counts_pct.iloc[9:].sum()})
                     value_counts_pct = pd.concat([top_n_pct, others_pct])
-    
-                fig = make_subplots(rows=1, cols=2, specs=[[{"type": "bar"}, {"type": "pie"}]],
-                                    subplot_titles=[f'Distribution de {col} (Barres)', f'Distribution de {col} (Camembert)'])
-    
-                fig.add_trace(
-                    go.Bar(x=value_counts.index, y=value_counts.values,
-                           text=[f"{x:.1f}%" for x in value_counts_pct.values.round(1)],
-                           textposition='outside', marker_color='lightseagreen'),
-                    row=1, col=1
-                )
-    
-                fig.add_trace(
-                    go.Pie(labels=value_counts.index, values=value_counts.values,
-                           textinfo='label+percent', marker=dict(colors=px.colors.sequential.Viridis)),
-                    row=1, col=2
-                )
-    
-                fig.update_layout(title=f'Distribution de {col} - {sheet_name}', height=500, showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
+        
+                # Créer les deux colonnes pour affichage côte à côte
+                col1, col2 = st.columns(2)
+        
+                with col1:
+                    st.markdown(f"#### 📊 Histogramme – {col}")
+                    fig_bar = go.Figure(data=[
+                        go.Bar(
+                            x=value_counts.index,
+                            y=value_counts.values,
+                            text=[f"{x:.1f}%" for x in value_counts_pct.values.round(1)],
+                            textposition='outside',
+                            marker_color='lightseagreen'
+                        )
+                    ])
+                    fig_bar.update_layout(
+                        title=f'Distribution de {col} (Barres)',
+                        xaxis_title=col,
+                        yaxis_title='Nombre',
+                        height=400,
+                        template="plotly_white"
+                    )
+                    st.plotly_chart(fig_bar, use_container_width=True)
+        
+                with col2:
+                    st.markdown(f"#### 🥧 Camembert – {col}")
+                    fig_pie = go.Figure(data=[
+                        go.Pie(
+                            labels=value_counts.index,
+                            values=value_counts.values,
+                            textinfo='label+percent',
+                            marker=dict(colors=px.colors.sequential.Viridis)
+                        )
+                    ])
+                    fig_pie.update_layout(
+                        title=f'Distribution de {col} (Camembert)',
+                        height=400
+                    )
+                    st.plotly_chart(fig_pie, use_container_width=True)
+
     
                 with st.expander(f"Détails sur {col}"):
                     for val, count in value_counts.items():
