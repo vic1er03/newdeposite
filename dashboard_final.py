@@ -967,12 +967,15 @@ def analyze_distributions(df, sheet_name):
         for j in range(num_graphs, len(ax)):
             fig.delaxes(ax[j])
         
+        # Ajouter un espacement entre les graphiques pour éviter la superposition
+        fig.subplots_adjust(hspace=0.5, wspace=0.5)  # Ajuste l'espacement vertical (hspace) et horizontal (wspace)
+        
         # Personnaliser le fond de la figure
         fig.patch.set_facecolor('lightgray')  # Fond de la figure
         
         # Affichage de la figure
         st.pyplot(fig)
-
+        
         # Graphique interactif Violin
         if len(selected_numeric) > 1:
             fig = go.Figure()
