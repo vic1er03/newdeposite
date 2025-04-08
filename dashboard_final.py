@@ -1506,7 +1506,7 @@ def main():
         else:
             visualize_missing_values(df_volontaire, "Données Volontaire")
             analyze_distributions(df_volontaire, "Données Volontaire")
-
+            analyze_blood_groups(df_volontaire)
        # CSS personnalisé pour styling clair et propre
         # CSS personnalisé
         # CSS personnalisé
