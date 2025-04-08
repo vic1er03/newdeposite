@@ -957,15 +957,15 @@ def analyze_distributions(df, sheet_name):
                     st.pyplot(fig2)
             
         # Graphique interactif Violin
-        with col2:
-            if len(selected_numeric) > 1:
-                fig = go.Figure()
-                for col in selected_numeric:
-                    fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
-                fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
-                                  xaxis_title='Variables', yaxis_title='Valeurs', height=600,
-                                  template='plotly_white')
-                st.plotly_chart(fig, use_container_width=True)
+    with col2:
+        if len(selected_numeric) > 1:
+            fig = go.Figure()
+            for col in selected_numeric:
+                fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
+            fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
+                              xaxis_title='Variables', yaxis_title='Valeurs', height=600,
+                              template='plotly_white')
+            st.plotly_chart(fig, use_container_width=True)
 
     # Analyser les variables catégorielles
     categorical_columns = df.select_dtypes(include=['object']).columns
