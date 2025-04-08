@@ -907,65 +907,62 @@ def analyze_distributions(df, sheet_name):
 
     # Analyser les variables numériques
     numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
-    col1, col2 = st.columns(2)
-    with col1:
-        if len(numeric_columns) > 0:
-            st.subheader("Variables numériques")
-            selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
-            
-            # Exemple de couleurs personnalisées pour chaque graphique
-            colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
-            
-            for i, col in enumerate(selected_numeric):
-                col1, col2 = st.columns(2)
-                # Choisir une couleur différente pour chaque graphique
-                color = colors[i % len(colors)]
-                # Histogramme avec KDE
-                fig1, ax1 = plt.subplots()
-                sns.histplot(df[col].dropna(), kde=True, ax=ax1, color=color, alpha=0.7)
-                ax1.set_title(f'Distribution de {col}')
-                ax1.set_xlabel(col)
-                ax1.set_ylabel('Fréquence')
-    
-                # Test de normalité
-                stat, p_value = stats.shapiro(df[col].dropna())
-                normality = "normale" if p_value > 0.05 else "non normale"
-                ax1.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
-                             xy=(0.05, 0.95), xycoords='axes fraction',
-                             bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                             ha='left', va='top')
-                with col1:
-                    st.pyplot(fig1)
-                    
-                # Boxplot
-                fig2, ax2 = plt.subplots()
-                sns.boxplot(x=df[col].dropna(), ax=ax2, color=color)
-                ax2.set_title(f'Boxplot de {col}')
-                ax2.set_xlabel(col)
+    if len(numeric_columns) > 0:
+        st.subheader("Variables numériques")
+        selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
         
-                # Statistiques descriptives
-                stats_desc = df[col].describe()
-                stats_text = (f"Moyenne: {stats_desc['mean']:.2f}\n"
-                              f"Médiane: {stats_desc['50%']:.2f}\n"
-                              f"Écart-type: {stats_desc['std']:.2f}\n"
-                              f"Min: {stats_desc['min']:.2f}\n"
-                              f"Max: {stats_desc['max']:.2f}")
-                ax2.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
-                             bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                             ha='left', va='top')
-                with col2:
-                    st.pyplot(fig2)
-            
-        # Graphique interactif Violin
-    with col2:
-        if len(selected_numeric) > 1:
-            fig = go.Figure()
-            for col in selected_numeric:
-                fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
-            fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
-                              xaxis_title='Variables', yaxis_title='Valeurs', height=600,
-                              template='plotly_white')
-            st.plotly_chart(fig, use_container_width=True)
+        # Exemple de couleurs personnalisées pour chaque graphique
+        colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
+        
+        for i, col in enumerate(selected_numeric):
+            col1, col2 = st.columns(2)
+            # Choisir une couleur différente pour chaque graphique
+            color = colors[i % len(colors)]
+            # Histogramme avec KDE
+            fig1, ax1 = plt.subplots()
+            sns.histplot(df[col].dropna(), kde=True, ax=ax1, color=color, alpha=0.7)
+            ax1.set_title(f'Distribution de {col}')
+            ax1.set_xlabel(col)
+            ax1.set_ylabel('Fréquence')
+
+            # Test de normalité
+            stat, p_value = stats.shapiro(df[col].dropna())
+            normality = "normale" if p_value > 0.05 else "non normale"
+            ax1.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
+                         xy=(0.05, 0.95), xycoords='axes fraction',
+                         bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                         ha='left', va='top')
+            with col1:
+                st.pyplot(fig1)
+                
+            # Boxplot
+            fig2, ax2 = plt.subplots()
+            sns.boxplot(x=df[col].dropna(), ax=ax2, color=color)
+            ax2.set_title(f'Boxplot de {col}')
+            ax2.set_xlabel(col)
+    
+            # Statistiques descriptives
+            stats_desc = df[col].describe()
+            stats_text = (f"Moyenne: {stats_desc['mean']:.2f}\n"
+                          f"Médiane: {stats_desc['50%']:.2f}\n"
+                          f"Écart-type: {stats_desc['std']:.2f}\n"
+                          f"Min: {stats_desc['min']:.2f}\n"
+                          f"Max: {stats_desc['max']:.2f}")
+            ax2.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
+                         bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                         ha='left', va='top')
+            with col2:
+                st.pyplot(fig2)
+        
+    # Graphique interactif Violin
+    if len(selected_numeric) > 1:
+        fig = go.Figure()
+        for col in selected_numeric:
+            fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
+        fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
+                          xaxis_title='Variables', yaxis_title='Valeurs', height=600,
+                          template='plotly_white')
+        st.plotly_chart(fig, use_container_width=True)
 
     # Analyser les variables catégorielles
     categorical_columns = df.select_dtypes(include=['object']).columns
