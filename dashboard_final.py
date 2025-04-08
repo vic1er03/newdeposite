@@ -1915,8 +1915,6 @@ def main():
             
             5. **Fidélisation**: Mettez en place des stratégies pour encourager les donneurs à revenir régulièrement.
             """)
-        else :
-            st.warning("Impossible d'analyser les tendances temporelles car aucune colonne de date appropriée n'a été identifiée.")
     
     elif page == "Fidélisation des donneurs":
         # Afficher l'image en haut, sur toute la largeur
