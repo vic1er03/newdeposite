@@ -524,7 +524,7 @@ def create_donor_clustering(df):
 @st.cache_data
 def create_campaign_analysis(df):
     """
-    Crée des visualisations pour analyser l'efficacité des campagnes de don.
+    Crée des visualisations pour analyser l'efficacité des campagnes de don avec des analyses complémentaires.
     """
     # Identifier les colonnes de date
     date_columns = [col for col in df.columns if 'date' in col.lower()]
@@ -630,6 +630,57 @@ def create_campaign_analysis(df):
             )
             
             demographic_figs.append(fig_edu)
+        
+        # Ajouter une analyse de l'âge des donneurs (si disponible)
+        if 'Age' in df_temp.columns:
+            # Créer des tranches d'âge pour simplifier l'analyse
+            bins = [0, 18, 30, 40, 50, 60, 100]
+            labels = ['0-18', '19-30', '31-40', '41-50', '51-60', '60+']
+            df_temp['Age_group'] = pd.cut(df_temp['Age'], bins=bins, labels=labels)
+            
+            age_monthly = df_temp.groupby(['year_month', 'Age_group']).size().reset_index(name='count')
+            age_monthly['year_month_str'] = age_monthly['year_month'].astype(str)
+            
+            fig_age = px.line(
+                age_monthly,
+                x='year_month_str',
+                y='count',
+                color='Age_group',
+                markers=True,
+                title="Évolution du nombre de donneurs par groupe d'âge",
+                labels={'count': 'Nombre de donneurs', 'year_month_str': 'Année-Mois', 'Age_group': 'Tranche d\'âge'}
+            )
+            
+            fig_age.update_layout(
+                xaxis_title="Période",
+                yaxis_title="Nombre de donneurs",
+                legend_title="Tranche d'âge",
+                font=dict(size=12),
+                height=400
+            )
+            
+            demographic_figs.append(fig_age)
+        
+        # Ajouter un graphique de heatmap pour visualiser les jours de la semaine et mois
+        if 'jour_semaine' in df_temp.columns:
+            heatmap_data = df_temp.groupby(['jour_semaine', 'month']).size().reset_index(name='count')
+            heatmap = px.density_heatmap(
+                heatmap_data,
+                x='month',
+                y='jour_semaine',
+                z='count',
+                title="Heatmap du nombre de donneurs par mois et jour de la semaine",
+                labels={'jour_semaine': 'Jour de la semaine', 'month': 'Mois', 'count': 'Nombre de donneurs'}
+            )
+            
+            heatmap.update_layout(
+                xaxis_title="Mois",
+                yaxis_title="Jour de la semaine",
+                font=dict(size=12),
+                height=400
+            )
+            
+            demographic_figs.append(heatmap)
         
         return fig1, demographic_figs
     else:
@@ -1240,19 +1291,19 @@ def main():
             # =============================
             # 🚘 Écran de voiture & 🫀 Cardiogramme (visuels)
             # =============================
-            col6, col7 = st.columns(2)
-            with col6:
-                st.subheader("🚘 Vue 'dashboard' – Style voiture")
-                st.image("https://cdn-icons-png.flaticon.com/512/2504/2504929.png", width=300, caption="Tableau de bord de suivi")
-            with col7:
-                st.subheader("🫀 Visualisation médicale – Cardiogramme")
-                cardiogramme = np.sin(np.linspace(0, 20, 200)) * np.exp(-0.05 * np.linspace(0, 20, 200))
-                fig_cardio, ax = plt.subplots()
-                ax.plot(cardiogramme, color="red")
-                ax.set_title("Simulation d'un signal cardiaque")
-                ax.set_xticks([])
-                ax.set_yticks([])
-                st.pyplot(fig_cardio)
+        col6, col7 = st.columns(2)
+        with col6:
+            st.subheader("🚘 Vue 'dashboard' – Style voiture")
+            st.image("https://cdn-icons-png.flaticon.com/512/2504/2504929.png", width=300, caption="Tableau de bord de suivi")
+        with col7:
+            st.subheader("🫀 Visualisation médicale – Cardiogramme")
+            cardiogramme = np.sin(np.linspace(0, 20, 200)) * np.exp(-0.05 * np.linspace(0, 20, 200))
+            fig_cardio, ax = plt.subplots()
+            ax.plot(cardiogramme, color="red")
+            ax.set_title("Simulation d'un signal cardiaque")
+            ax.set_xticks([])
+            ax.set_yticks([])
+            st.pyplot(fig_cardio)
         
             st.markdown("---")
             st.markdown("<p style='text-align:center; color:#808080;'>© 2025 Plateforme d'analyse des dons de sang</p>", unsafe_allow_html=True)
