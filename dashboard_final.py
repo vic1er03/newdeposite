@@ -784,11 +784,12 @@ def create_donor_retention_analysis(df):
 @st.cache_data
 def create_sentiment_analysis(df):
     """
-    Crée des visualisations pour l'analyse de sentiment des commentaires des donneurs (en français).
+    Crée des visualisations stylisées pour l'analyse de sentiment des commentaires des donneurs (en français).
     """
-    # Détecter les colonnes textuelles susceptibles d'être des commentaires
-    comment_columns = [col for col in df.columns if any(term in col.lower() for term in 
-                      ['préciser','autre', 'commentaire', 'feedback'])]
+    st.header("💬 Analyse de sentiment des commentaires")
+
+    # Détection des colonnes textuelles
+    comment_columns = [col for col in df.columns if any(term in col.lower() for term in ['préciser','autre', 'commentaire', 'feedback'])]
 
     if not comment_columns:
         st.warning("Aucune colonne de commentaires trouvée.")
@@ -801,17 +802,14 @@ def create_sentiment_analysis(df):
         st.warning("Aucun commentaire exploitable pour l'analyse.")
         return None, None, None
 
-    st.subheader("💬 Analyse de sentiment des commentaires (en français)")
-
-    # Initialisation de TextBlob-FR
+    # Initialisation analyseur de sentiment
     tb = Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())
 
-    # Analyse de sentiment
+    # Fonction pour sentiment catégorique
     def analyze_sentiment(text):
         try:
             blob = tb(str(text))
             polarite = blob.sentiment[0]
-            # Catégorisation
             if polarite > 0.01:
                 return "Positif"
             elif polarite < -0.01:
@@ -821,44 +819,64 @@ def create_sentiment_analysis(df):
         except:
             return "Indéfini"
 
-    comments_df['Sentiment'] = comments_df[selected_col].apply(analyze_sentiment)
+    # Fonction pour score brut
     def analyze_sentiments(text):
         try:
             blob = tb(str(text))
-            polarite = blob.sentiment[0]
-            return polarite
+            return blob.sentiment[0]
         except:
-            return 'pass'
-            
+            return None
+
+    # Application des analyses
+    comments_df['Sentiment'] = comments_df[selected_col].apply(analyze_sentiment)
     comments_df['Score'] = comments_df[selected_col].apply(analyze_sentiments)
-    # 🔢 Compter les sentiments
-    sentiment_counts = comments_df['Sentiment'].value_counts().reset_index()
-    sentiment_counts.columns = ['Sentiment', 'Nombre']
+
+    # 🔢 Résumés des résultats
+    total_comments = len(comments_df)
+    sentiment_counts = comments_df['Sentiment'].value_counts()
+    avg_score = comments_df['Score'].mean()
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div style='background-color:#E0F7FA;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{total_comments}</h3><p>Commentaires analysés</p>
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        pos_pct = sentiment_counts.get("Positif", 0) / total_comments * 100
+        st.markdown(f"""
+        <div style='background-color:#E8F5E9;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{pos_pct:.1f}%</h3><p>Positifs</p>
+        </div>""", unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div style='background-color:#FFF3E0;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{avg_score:.2f}</h3><p>Score moyen</p>
+        </div>""", unsafe_allow_html=True)
 
     # 📊 Graphique circulaire
-    fig1 = px.pie(sentiment_counts,
-                  values='Nombre',
-                  names='Sentiment',
+    pie_df = sentiment_counts.reset_index()
+    pie_df.columns = ['Sentiment', 'Nombre']
+    fig1 = px.pie(pie_df, values='Nombre', names='Sentiment',
                   title="Répartition des sentiments",
                   color_discrete_sequence=px.colors.qualitative.Set3)
-
-    st.plotly_chart(fig1)
+    st.plotly_chart(fig1, use_container_width=True)
 
     # ☁️ Nuage de mots
+    st.subheader("☁️ Nuage de mots des commentaires")
     all_comments = ' '.join(comments_df[selected_col].astype(str).tolist())
     wordcloud = WordCloud(width=800, height=400, background_color='white', max_words=100).generate(all_comments)
-
-    st.subheader("☁️ Nuage de mots des commentaires")
     fig2, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(wordcloud, interpolation='bilinear')
     ax.axis('off')
     st.pyplot(fig2)
 
-    # 📋 Afficher le tableau avec commentaires et sentiment
-    st.subheader("🧾 Détail des commentaires analysés")
-    st.dataframe(comments_df[[selected_col, 'Sentiment','Score']])
+    # 🧾 Détails
+    st.subheader("📝 Détails des commentaires analysés")
+    st.dataframe(comments_df[[selected_col, 'Sentiment', 'Score']])
 
     return fig1, wordcloud, comments_df
+
 
 def set_background(image_file):
     with open(image_file, "rb") as f:
@@ -874,28 +892,62 @@ def set_background(image_file):
     return st.markdown(bg_image, unsafe_allow_html=True)
 
 def Apercue(df_2019):
-            st.dataframe(df_2019.head())
-            
-            # Afficher les statistiques descriptives
-            st.subheader("Statistiques descriptives")
-            st.dataframe(df_2019.describe())
-            
-            # Visualiser les valeurs manquantes
-            st.subheader("Valeurs manquantes")
-            missing = df_2019.isnull().sum().sort_values(ascending=False)
-            missing = missing[missing > 0]
-            if len(missing) > 0:
-                missing_percent = (missing / len(df_2019) * 100).round(2)
-                missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
-                fig = px.bar(missing_df, x=missing_df.index, y='Pourcentage (%)', 
-                            text='Nombre',
-                            title='Valeurs manquantes - Données 2019',
-                            color='Pourcentage (%)',
-                            color_continuous_scale='Viridis')
-                fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Aucune valeur manquante dans les données 2019.")
+    st.header("🧾 Aperçu des données - Données 2019")
+
+    # Bloc de résumé façon dashboard
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown(f"""
+        <div style='background-color:#DDEEFF;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{df_2019.shape[0]}</h3><p>Lignes</p>
+        </div>""", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div style='background-color:#DDEEFF;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{df_2019.shape[1]}</h3><p>Colonnes</p>
+        </div>""", unsafe_allow_html=True)
+
+    missing_total = df_2019.isnull().sum().sum()
+    with col3:
+        st.markdown(f"""
+        <div style='background-color:#FFDDDD;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{missing_total}</h3><p>Valeurs manquantes</p>
+        </div>""", unsafe_allow_html=True)
+
+    numeric_count = df_2019.select_dtypes(include=['int64', 'float64']).shape[1]
+    with col4:
+        st.markdown(f"""
+        <div style='background-color:#E0FFE0;padding:15px;border-radius:10px;text-align:center'>
+            <h3>{numeric_count}</h3><p>Colonnes numériques</p>
+        </div>""", unsafe_allow_html=True)
+
+    # Affichage preview
+    st.subheader("🔍 Aperçu du DataFrame")
+    st.dataframe(df_2019.head())
+
+    # Statistiques descriptives
+    st.subheader("📊 Statistiques descriptives")
+    st.dataframe(df_2019.describe())
+
+    # Valeurs manquantes
+    st.subheader("❗ Valeurs manquantes")
+    missing = df_2019.isnull().sum().sort_values(ascending=False)
+    missing = missing[missing > 0]
+    if len(missing) > 0:
+        missing_percent = (missing / len(df_2019) * 100).round(2)
+        missing_df = pd.DataFrame({'Nombre': missing, 'Pourcentage (%)': missing_percent})
+
+        fig = px.bar(missing_df, x=missing_df.index, y='Pourcentage (%)',
+                     text='Nombre',
+                     title='Valeurs manquantes - Données 2019',
+                     color='Pourcentage (%)',
+                     color_continuous_scale='Viridis')
+        fig.update_layout(xaxis_title='Variables', yaxis_title='Pourcentage (%)')
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.success("✅ Aucune valeur manquante dans les données 2019.")
+
         
 # Visualisation des valeurs manquantes
 def visualize_missing_values(df, title):
@@ -933,121 +985,142 @@ def analyze_distributions(df, sheet_name):
     """
     Analyse les distributions des variables avec visualisation intégrable à un dashboard Streamlit.
     """
-    st.header(f"Analyse des distributions - {sheet_name}")
+    st.header(f"📊 Analyse des distributions - {sheet_name}")
 
-    # Analyser les variables numériques
     numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
-    if len(numeric_columns) > 0:
-        st.subheader("Variables numériques")
-        selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
-        
-        # Exemple de couleurs personnalisées pour chaque graphique
-        colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
-        
-        for i, col in enumerate(selected_numeric):
-            col1, col2 = st.columns(2)
-            # Choisir une couleur différente pour chaque graphique
-            color = colors[i % len(colors)]
-            # Histogramme avec KDE
-            fig1, ax1 = plt.subplots()
-            sns.histplot(df[col].dropna(), kde=True, ax=ax1, color=color, alpha=0.7)
-            ax1.set_title(f'Distribution de {col}')
-            ax1.set_xlabel(col)
-            ax1.set_ylabel('Fréquence')
-
-            # Test de normalité
-            stat, p_value = stats.shapiro(df[col].dropna())
-            normality = "normale" if p_value > 0.05 else "non normale"
-            ax1.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
-                         xy=(0.05, 0.95), xycoords='axes fraction',
-                         bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                         ha='left', va='top')
-            with col1:
-                st.pyplot(fig1)
-                
-            # Boxplot
-            fig2, ax2 = plt.subplots()
-            sns.boxplot(x=df[col].dropna(), ax=ax2, color=color)
-            ax2.set_title(f'Boxplot de {col}')
-            ax2.set_xlabel(col)
-    
-            # Statistiques descriptives
-            stats_desc = df[col].describe()
-            stats_text = (f"Moyenne: {stats_desc['mean']:.2f}\n"
-                          f"Médiane: {stats_desc['50%']:.2f}\n"
-                          f"Écart-type: {stats_desc['std']:.2f}\n"
-                          f"Min: {stats_desc['min']:.2f}\n"
-                          f"Max: {stats_desc['max']:.2f}")
-            ax2.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
-                         bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
-                         ha='left', va='top')
-            with col2:
-                st.pyplot(fig2)
-        
-    # Graphique interactif Violin
-    if len(selected_numeric) > 1:
-        fig = go.Figure()
-        for col in selected_numeric:
-            fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
-        fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
-                          xaxis_title='Variables', yaxis_title='Valeurs', height=600,
-                          template='plotly_white')
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Analyser les variables catégorielles
     categorical_columns = df.select_dtypes(include=['object']).columns
 
+    # ─────────────────────────────
+    # 🔹 Bloc Résumé (statistiques clés)
+    # ─────────────────────────────
+    st.subheader("📌 Statistiques descriptives globales")
+
+    if len(numeric_columns) > 0:
+        stats_globales = df[numeric_columns].describe()
+
+        total_obs = df.shape[0]
+        moyennes = df[numeric_columns].mean()
+        medianes = df[numeric_columns].median()
+        ecarts_types = df[numeric_columns].std()
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total d'observations", f"{total_obs}")
+        with col2:
+            st.metric("Moyenne globale", f"{moyennes.mean():,.2f}")
+        with col3:
+            st.metric("Écart-type global", f"{ecarts_types.mean():,.2f}")
+
     if len(categorical_columns) > 0:
-        st.subheader("Variables catégorielles")
-        selected_categorical = list(categorical_columns)[:min(5, len(categorical_columns))]
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Variables catégorielles", f"{len(categorical_columns)}")
+        with col2:
+            total_cat_values = sum(df[col].nunique() for col in categorical_columns)
+            st.metric("Valeurs uniques totales", f"{total_cat_values}")
 
-        for col in selected_categorical:
-            value_counts = df[col].value_counts()
-            value_counts_pct = df[col].value_counts(normalize=True) * 100
+    st.markdown("---")
 
-            if len(value_counts) > 10:
-                top_n = value_counts.nlargest(9)
-                others = pd.Series({'Autres': value_counts.iloc[9:].sum()})
-                value_counts = pd.concat([top_n, others])
+    # ─────────────────────────────
+    # 🔹 Analyse des variables numériques
+    # ─────────────────────────────
+    if len(numeric_columns) > 0:
+        st.subheader("📈 Variables numériques")
+        selected_numeric = list(numeric_columns)[:min(5, len(numeric_columns))]
 
-                top_n_pct = value_counts_pct.nlargest(9)
-                others_pct = pd.Series({'Autres': value_counts_pct.iloc[9:].sum()})
-                value_counts_pct = pd.concat([top_n_pct, others_pct])
+        colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold']
+        for i, col in enumerate(selected_numeric):
+            color = colors[i % len(colors)]
+            col1, col2 = st.columns(2)
 
-            # Subplots Barres + Camembert
-            fig = make_subplots(rows=1, cols=2, specs=[[{"type": "bar"}, {"type": "pie"}]],
-                                subplot_titles=[f'Distribution de {col} (Barres)', f'Distribution de {col} (Camembert)'])
+            # Histogramme avec KDE
+            with col1:
+                fig1, ax1 = plt.subplots()
+                sns.histplot(df[col].dropna(), kde=True, ax=ax1, color=color, alpha=0.7)
+                ax1.set_title(f'Distribution de {col}')
+                stat, p_value = stats.shapiro(df[col].dropna())
+                normality = "normale" if p_value > 0.05 else "non normale"
+                ax1.annotate(f'p = {p_value:.4f}\nDistribution {normality}',
+                             xy=(0.05, 0.95), xycoords='axes fraction',
+                             bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                             ha='left', va='top')
+                st.pyplot(fig1)
 
-            fig.add_trace(
-                go.Bar(x=value_counts.index, y=value_counts.values,
-                       text=[f"{x:.1f}%" for x in value_counts_pct.values.round(1)],
-                       textposition='outside', marker_color='lightseagreen'),
-                row=1, col=1
-            )
+            # Boxplot avec stats descriptives
+            with col2:
+                fig2, ax2 = plt.subplots()
+                sns.boxplot(x=df[col].dropna(), ax=ax2, color=color)
+                ax2.set_title(f'Boxplot de {col}')
+                stats_desc = df[col].describe()
+                stats_text = (f"Moyenne: {stats_desc['mean']:.2f}\n"
+                              f"Médiane: {stats_desc['50%']:.2f}\n"
+                              f"Écart-type: {stats_desc['std']:.2f}\n"
+                              f"Min: {stats_desc['min']:.2f}\n"
+                              f"Max: {stats_desc['max']:.2f}")
+                ax2.annotate(stats_text, xy=(0.05, 0.95), xycoords='axes fraction',
+                             bbox=dict(boxstyle="round,pad=0.3", ec="gray", alpha=0.8),
+                             ha='left', va='top')
+                st.pyplot(fig2)
 
-            fig.add_trace(
-                go.Pie(labels=value_counts.index, values=value_counts.values,
-                       textinfo='label+percent', marker=dict(colors=px.colors.sequential.Viridis)),
-                row=1, col=2
-            )
-
-            fig.update_layout(title=f'Distribution de {col} - {sheet_name}', height=500, showlegend=False)
+        # Comparaison globale avec Violin plot
+        if len(selected_numeric) > 1:
+            st.subheader("🎻 Comparaison globale (Violin plots)")
+            fig = go.Figure()
+            for col in selected_numeric:
+                fig.add_trace(go.Violin(y=df[col].dropna(), name=col, box_visible=True, meanline_visible=True))
+            fig.update_layout(title=f'Comparaison des distributions - {sheet_name}',
+                              xaxis_title='Variables', yaxis_title='Valeurs', height=600,
+                              template='plotly_white')
             st.plotly_chart(fig, use_container_width=True)
-            
-            # Supposons que value_counts et value_counts_pct soient déjà définis.
-            with st.expander(f"Détails sur {col}"):
-                for val, count in value_counts.items():
-                    col1, col2 = st.columns([2, 1])  # Créer deux colonnes pour séparer le titre et la valeur
-                    with col1:
-                        # Bloc titre avec icône et nom, couleur bleu ciel et titre en gras
-                        st.markdown(f"<div style='background-color: #87CEFA; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
-                                    f"<strong>{val}</strong> <span style='margin-left: 10px;'>🔍</span></div>", unsafe_allow_html=True)
-                    with col2:
-                        # Bloc valeur, encadré par un rectangle, sans couleur de fond
-                        st.markdown(f"<div style='border: 1px solid #ccc; padding: 10px; border-radius: 5px;'>"
-                                    f"Count: {count} <br> Percentage: {value_counts_pct[val]:.1f}%</div>", unsafe_allow_html=True)
-            
 
+        # ─────────────────────────────
+        # 🔹 Analyse des variables catégorielles
+        # ─────────────────────────────
+        if len(categorical_columns) > 0:
+            st.subheader("📊 Variables catégorielles")
+            selected_categorical = list(categorical_columns)[:min(5, len(categorical_columns))]
+    
+            for col in selected_categorical:
+                value_counts = df[col].value_counts()
+                value_counts_pct = df[col].value_counts(normalize=True) * 100
+    
+                if len(value_counts) > 10:
+                    top_n = value_counts.nlargest(9)
+                    others = pd.Series({'Autres': value_counts.iloc[9:].sum()})
+                    value_counts = pd.concat([top_n, others])
+    
+                    top_n_pct = value_counts_pct.nlargest(9)
+                    others_pct = pd.Series({'Autres': value_counts_pct.iloc[9:].sum()})
+                    value_counts_pct = pd.concat([top_n_pct, others_pct])
+    
+                fig = make_subplots(rows=1, cols=2, specs=[[{"type": "bar"}, {"type": "pie"}]],
+                                    subplot_titles=[f'Distribution de {col} (Barres)', f'Distribution de {col} (Camembert)'])
+    
+                fig.add_trace(
+                    go.Bar(x=value_counts.index, y=value_counts.values,
+                           text=[f"{x:.1f}%" for x in value_counts_pct.values.round(1)],
+                           textposition='outside', marker_color='lightseagreen'),
+                    row=1, col=1
+                )
+    
+                fig.add_trace(
+                    go.Pie(labels=value_counts.index, values=value_counts.values,
+                           textinfo='label+percent', marker=dict(colors=px.colors.sequential.Viridis)),
+                    row=1, col=2
+                )
+    
+                fig.update_layout(title=f'Distribution de {col} - {sheet_name}', height=500, showlegend=False)
+                st.plotly_chart(fig, use_container_width=True)
+    
+                with st.expander(f"Détails sur {col}"):
+                    for val, count in value_counts.items():
+                        col1, col2 = st.columns([2, 1])
+                        with col1:
+                            st.markdown(f"<div style='background-color: #87CEFA; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                        f"<strong>{val}</strong> <span style='margin-left: 10px;'>🔍</span></div>", unsafe_allow_html=True)
+                        with col2:
+                            st.markdown(f"<div style='border: 1px solid #ccc; padding: 10px; border-radius: 5px;'>"
+                                        f"Count: {count} <br> Pourcentage: {value_counts_pct[val]:.1f}%</div>", unsafe_allow_html=True)
 
 
         
