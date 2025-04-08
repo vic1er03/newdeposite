@@ -1498,43 +1498,67 @@ def main():
                         
                         # Âge moyen
                         if 'Age' in ideal_profile.columns:
-                            st.metric(
-                                label="Âge moyen", 
-                                value=f"{ideal_profile['Age'].mean():.1f} ans", 
-                                delta=None, 
-                                help="Moyenne des âges dans le profil"
+                            # Bloc du titre
+                            st.markdown(
+                                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                f"<strong>Âge moyen</strong><i class='fa fa-calendar' style='margin-left: 10px;'></i></div>",
+                                unsafe_allow_html=True
+                            )
+                            # Bloc de la valeur
+                            st.markdown(
+                                f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                                f"<strong>{ideal_profile['Age'].mean():.1f} ans</strong></div>",
+                                unsafe_allow_html=True
                             )
                         
                         # Genre
                         if 'Genre_' in ideal_profile.columns:
                             gender_pct = ideal_profile['Genre_'].value_counts(normalize=True) * 100
-                            st.metric(
-                                label="Genre", 
-                                value=f"{gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes", 
-                                delta=None, 
-                                help="Répartition des genres"
+                            # Bloc du titre
+                            st.markdown(
+                                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                f"<strong>Genre</strong><i class='fa fa-user' style='margin-left: 10px;'></i></div>",
+                                unsafe_allow_html=True
+                            )
+                            # Bloc de la valeur
+                            st.markdown(
+                                f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                                f"<strong>{gender_pct.get('Homme', 0):.1f}% Hommes, {gender_pct.get('Femme', 0):.1f}% Femmes</strong></div>",
+                                unsafe_allow_html=True
                             )
                         
                         # Niveau d'étude
                         if 'Niveau_d\'etude' in ideal_profile.columns:
                             top_edu = ideal_profile['Niveau_d\'etude'].value_counts(normalize=True).head(2)
                             for edu, pct in top_edu.items():
-                                st.metric(
-                                    label=f"Niveau d'études: {edu}", 
-                                    value=f"{pct*100:.1f}%", 
-                                    delta=None, 
-                                    help="Pourcentage des niveaux d'études"
+                                # Bloc du titre
+                                st.markdown(
+                                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                    f"<strong>Niveau d'études: {edu}</strong><i class='fa fa-graduation-cap' style='margin-left: 10px;'></i></div>",
+                                    unsafe_allow_html=True
+                                )
+                                # Bloc de la valeur
+                                st.markdown(
+                                    f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                                    f"<strong>{pct*100:.1f}%</strong></div>",
+                                    unsafe_allow_html=True
                                 )
                         
                         # Situation matrimoniale
                         if 'Situation_Matrimoniale_(SM)' in ideal_profile.columns:
                             top_marital = ideal_profile['Situation_Matrimoniale_(SM)'].value_counts(normalize=True).head(2)
                             for status, pct in top_marital.items():
-                                st.metric(
-                                    label=f"Situation matrimoniale: {status}", 
-                                    value=f"{pct*100:.1f}%", 
-                                    delta=None, 
-                                    help="Répartition de la situation matrimoniale"
+                                # Bloc du titre
+                                st.markdown(
+                                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                    f"<strong>Situation matrimoniale: {status}</strong><i class='fa fa-heart' style='margin-left: 10px;'></i></div>",
+                                    unsafe_allow_html=True
+                                )
+                                # Bloc de la valeur
+                                st.markdown(
+                                    f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                                    f"<strong>{pct*100:.1f}%</strong></div>",
+                                    unsafe_allow_html=True
                                 )
                     
                     # Colonne 2: Caractéristiques géographiques
@@ -1545,12 +1569,19 @@ def main():
                         for geo_col in geo_columns:
                             top_geo = ideal_profile[geo_col].value_counts(normalize=True).head(3)
                             for zone, pct in top_geo.items():
-                                st.metric(
-                                    label=f"{geo_col} principal: {zone}", 
-                                    value=f"{pct*100:.1f}%", 
-                                    delta=None, 
-                                    help="Répartition géographique"
+                                # Bloc du titre
+                                st.markdown(
+                                    f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                                    f"<strong>{geo_col} principal: {zone}</strong><i class='fa fa-map-marker' style='margin-left: 10px;'></i></div>",
+                                    unsafe_allow_html=True
                                 )
+                                # Bloc de la valeur
+                                st.markdown(
+                                    f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
+                                    f"<strong>{pct*100:.1f}%</strong></div>",
+                                    unsafe_allow_html=True
+                                )
+
 
                     
                     # Créer un radar chart pour visualiser le profil idéal
