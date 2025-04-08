@@ -917,7 +917,7 @@ def analyze_distributions(df, sheet_name):
             colors = ['steelblue', 'lightseagreen', 'orangered', 'darkviolet', 'gold', 'mediumslateblue', 'tomato', 'royalblue']
             
             for i, col in enumerate(selected_numeric):
-                 col1, col2 = st.columns(2)
+                col1, col2 = st.columns(2)
                 # Choisir une couleur différente pour chaque graphique
                 color = colors[i % len(colors)]
                 # Histogramme avec KDE
