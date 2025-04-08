@@ -81,6 +81,7 @@ from plotly.subplots import make_subplots
 import warnings
 warnings.filterwarnings('ignore')
 import calendar
+from scipy import stats
 
 import pandas as pd
 import seaborn as sns
@@ -336,12 +337,13 @@ def create_geo_map(df, location_column, color_column=None, zoom_start=10):
 # Fonction pour créer un graphique de santé et éligibilité
 @st.cache_data
 def analyze_categorical_relationships(df, sheet_name):
-    st.subheader(f"Analyse des relations entre variables catégorielles – {sheet_name}")
-    
+    st.subheader(f"📊 Analyse des relations entre variables catégorielles – {sheet_name}")
+
     categorical_columns = df.select_dtypes(include=['object']).columns
     valid_columns = [col for col in categorical_columns if 1 < df[col].nunique() <= 10]
 
     if len(valid_columns) >= 2:
+        # 🎯 Détection automatique de la variable cible
         target_column = None
         for potential_target in ['ÉLIGIBILITÉ_AU_DON.', 'Éligibilité_au_don', 'Eligibilité']:
             if potential_target in valid_columns:
@@ -350,40 +352,39 @@ def analyze_categorical_relationships(df, sheet_name):
 
         if target_column:
             st.markdown(
-                f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
-                f"<strong>Variable cible détectée : {target_column}</strong><i class='fa fa-bullseye' style='margin-left: 10px;'></i></div>",
+                f"<div style='background-color: #e6f4ff; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
+                f"<strong>🎯 Variable cible détectée : <code>{target_column}</code></strong></div>",
                 unsafe_allow_html=True
             )
 
-            # Initialisation pour les stats générales
+            # === Résumé des tests ===
             total_tests = 0
             nb_significatives = 0
             p_values = []
             relations = []
 
-            # Parcours des relations
             for col in valid_columns:
                 if col != target_column:
                     contingency = pd.crosstab(df[target_column], df[col])
                     chi2, p, dof, expected = stats.chi2_contingency(contingency)
-
                     total_tests += 1
                     p_values.append(p)
                     if p < 0.05:
                         nb_significatives += 1
                     relations.append((p, col))
 
-            # Métriques résumées en haut
             relation_mini = min(relations, key=lambda x: x[0]) if relations else (None, None)
 
             col1, col2, col3, col4, col5 = st.columns(5)
-            col1.metric("Total de tests", total_tests)
-            col2.metric("Relations significatives", nb_significatives)
-            col3.metric("p-value moyenne", f"{sum(p_values)/len(p_values):.4f}" if p_values else "N/A")
-            col4.metric("p-value min", f"{relation_mini[0]:.4f}" if relation_mini[0] is not None else "N/A")
-            col5.metric("Relation la + significative", f"{target_column} vs {relation_mini[1]}" if relation_mini[1] else "N/A")
+            col1.metric("🔢 Total de tests", total_tests)
+            col2.metric("✅ Relations significatives", nb_significatives)
+            col3.metric("📉 p-value moyenne", f"{sum(p_values)/len(p_values):.4f}" if p_values else "N/A")
+            col4.metric("📌 p-value min", f"{relation_mini[0]:.4f}" if relation_mini[0] else "N/A")
+            col5.metric("📊 Plus forte relation", f"{target_column} vs {relation_mini[1]}" if relation_mini[1] else "N/A")
 
-            # Affichage détaillé des relations
+            st.markdown("---")
+
+            # === Visualisation des relations ===
             for col in valid_columns:
                 if col != target_column:
                     contingency = pd.crosstab(df[target_column], df[col])
@@ -391,39 +392,47 @@ def analyze_categorical_relationships(df, sheet_name):
                     association = "✅ significative" if p < 0.05 else "❌ non significative"
 
                     st.markdown(
-                        f"<div style='background-color: lightblue; padding: 10px; border-radius: 5px; display: flex; align-items: center;'>"
-                        f"<strong>Relation entre `{target_column}` et `{col}`</strong><i class='fa fa-exchange' style='margin-left: 10px;'></i></div>",
+                        f"<div style='background-color: #f0f8ff; padding: 10px; border-left: 5px solid #007ACC; margin-top: 20px;'>"
+                        f"<strong>Relation entre <code>{target_column}</code> et <code>{col}</code></strong><br>"
+                        f"Test du χ² : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
                         unsafe_allow_html=True
                     )
 
-                    st.markdown(
-                        f"<div style='border: 2px solid black; padding: 10px; border-radius: 5px; margin-top: 10px;'>"
-                        f"Test du chi2 : χ² = {chi2:.2f}, p = {p:.4f} → {association}</div>",
-                        unsafe_allow_html=True
-                    )
-
-                    # Disposition des deux graphiques côte à côte
-                    col_g1, col_g2 = st.columns(2)
+                    # Espacement des deux graphiques côte à côte
+                    col_g1, col_g2 = st.columns([1, 1])
 
                     with col_g1:
+                        st.markdown("#### 📊 Diagramme en barres")
                         contingency_pct = contingency.div(contingency.sum(axis=1), axis=0) * 100
-                        fig_bar = px.bar(contingency_pct,
-                                         barmode='stack',
-                                         title=f"{target_column} vs {col} (p={p:.4f})",
-                                         labels={'value': 'Pourcentage (%)', 'index': target_column})
+                        fig_bar = px.bar(
+                            contingency_pct,
+                            barmode='group',
+                            title=f"{target_column} vs {col}",
+                            labels={'value': 'Pourcentage (%)', 'index': target_column},
+                            height=350
+                        )
                         fig_bar.update_layout(template='plotly_white')
-                        st.plotly_chart(fig_bar)
+                        st.plotly_chart(fig_bar, use_container_width=True)
 
                     with col_g2:
-                        fig_mosaic, ax = plt.subplots(figsize=(6, 5))
-                        mosaic_data = {(i, j): contingency.loc[i, j] for i in contingency.index for j in contingency.columns}
-                        mosaic(mosaic_data, ax=ax, title=f'{target_column} vs {col}')
-                        st.pyplot(fig_mosaic)
+                        st.markdown("#### 🧁 Répartition circulaire")
+                        pie_data = df[col].value_counts().reset_index()
+                        pie_data.columns = [col, 'count']
+                        fig_pie = px.pie(
+                            pie_data,
+                            names=col,
+                            values='count',
+                            hole=0.4,
+                            color_discrete_sequence=px.colors.sequential.RdBu,
+                            title=f"Distribution de {col}"
+                        )
+                        st.plotly_chart(fig_pie, use_container_width=True)
 
+            st.markdown("---")
         else:
-            st.warning("Aucune variable cible claire trouvée.")
+            st.warning("⚠️ Aucune variable cible claire trouvée parmi les colonnes catégorielles.")
     else:
-        st.warning("Pas assez de variables catégorielles valides pour analyser les relations.")
+        st.warning("⚠️ Pas assez de variables catégorielles valides pour effectuer une analyse.")
 
 
 # Fonction pour créer un graphique de clustering des donneurs
@@ -1307,17 +1316,20 @@ def main():
     
    
     # === Logique d'affichage par page ===
+    # Page d'accueil
     if page == "Accueil":
         st.markdown("""
             <style>
             .block-container {
-                padding: 2rem;
+                padding: 0rem;
+                margin: 0 auto;
+                max-width: 100%;
             }
             .card {
                 background-color: #0a0f3c;
                 padding: 1rem;
                 border-radius: 15px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
                 color: white;
             }
             .centered {
@@ -1326,18 +1338,13 @@ def main():
             </style>
         """, unsafe_allow_html=True)
     
-        # Titre principal
         st.markdown('''<h1 class="centered" style="color:#ffffff;">🩸 Tableau de Bord d'Analyse des Donneurs de Sang</h1>''', unsafe_allow_html=True)
         st.markdown('<p class="centered" style="font-size:18px; color:#b0b0b0;">Optimisation des campagnes de don et visualisation des données médicales</p>', unsafe_allow_html=True)
-        
     
-        # =============================
-        # 🔄 Layout global du tableau de bord (grille visuelle)
-        # =============================
-        col1, col2 = st.columns([2, 1])
+        # ========== Section 1 : Répartition géographique et types de donneurs ==========
+        col1, col2 = st.columns([3, 2])
     
         with col1:
-            # Carte du Cameroun avec cercles
             st.subheader("📍 Répartition géographique des dons")
             cameroon_coords = {
                 'Centre': (3.848, 11.502),
@@ -1354,55 +1361,78 @@ def main():
             })
             fig_map = px.scatter_mapbox(region_data, lat='Lat', lon='Lon', size='Dons', color='Region',
                                         hover_name='Region', zoom=5.5, height=400, mapbox_style="carto-positron")
+            fig_map.update_traces(marker=dict(sizemode='area', opacity=0.6))
             st.plotly_chart(fig_map, use_container_width=True)
     
         with col2:
-            # Cercle de répartition (Pie Chart)
-            st.subheader("🔘 Type de donneurs (simulation)")
+            st.subheader("🔘 Type de donneurs")
             pie_data = pd.DataFrame({
                 "Type": ["Volontaire", "Familial", "Rémunéré"],
                 "Pourcentage": [58, 22, 20]
             })
             fig_pie = px.pie(pie_data, values='Pourcentage', names='Type',
-                             color_discrete_sequence=px.colors.sequential.RdBu,
-                             hole=0.4)
+                             color_discrete_sequence=px.colors.sequential.RdBu, hole=0.4)
+            fig_pie.update_traces(pull=[0.05, 0, 0.05], textinfo='label+percent')
             st.plotly_chart(fig_pie, use_container_width=True)
     
-            st.markdown("---")
-        # =============================
-        # 🎛️ Table de mixage
-        # =============================
-        st.subheader("🎚️ Tableau de Contrôle Interactif")
+        st.markdown("---")
+    
+        # ========== Section 2 : Tableau de contrôle et engagement ==========
         col3, col4, col5 = st.columns(3)
         with col3:
-            freq = st.slider("🩺 Fréquence des dons", min_value=0, max_value=10, value=6)
+            freq = st.slider("🩺 Fréquence des dons", 0, 10, 6)
         with col4:
-            retention = st.slider("📅 Fidélité", min_value=0, max_value=100, value=45)
+            retention = st.slider("📅 Fidélité", 0, 100, 45)
         with col5:
-            satisfaction = st.slider("😊 Satisfaction", min_value=0, max_value=100, value=80)
+            satisfaction = st.slider("😊 Satisfaction", 0, 100, 80)
     
         score_mix = (freq * 10 + retention + satisfaction) / 3
-        st.markdown(f"<h3 style='color:#29d8db;'>Score global d'engagement : {score_mix:.1f}%</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='text-align:center; color:#29d8db;'>⭐ Score global d'engagement : {score_mix:.1f}%</h3>", unsafe_allow_html=True)
     
-        # =============================
-        # 🚘 Écran de voiture & 🫀 Cardiogramme (visuels)
-        # =============================
+        # Radar chart dynamique
+        radar_data = pd.DataFrame({
+            'Critères': ['Fréquence', 'Fidélité', 'Satisfaction'],
+            'Score': [freq * 10, retention, satisfaction]
+        })
+    
+        fig_radar = go.Figure()
+        fig_radar.add_trace(go.Scatterpolar(
+            r=radar_data['Score'],
+            theta=radar_data['Critères'],
+            fill='toself',
+            line_color='deepskyblue',
+            name='Engagement'
+        ))
+        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+                                showlegend=False, height=400)
+        st.plotly_chart(fig_radar, use_container_width=True)
+    
+        # ========== Section 3 : Graphiques animés supplémentaires ==========
         col6, col7 = st.columns(2)
+    
         with col6:
-            st.subheader("🚘 Vue 'dashboard' – Style voiture")
-            st.image("https://cdn-icons-png.flaticon.com/512/2504/2504929.png", width=300, caption="Tableau de bord de suivi")
+            st.subheader("📊 Suivi des dons sur l’année")
+            mois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
+            dons = np.random.randint(80, 300, size=12)
+            fig_bar = px.bar(x=mois, y=dons, labels={'x': 'Mois', 'y': 'Nombre de dons'},
+                             color=dons, color_continuous_scale='Bluered_r')
+            fig_bar.update_traces(marker_line_color='white', marker_line_width=1.5)
+            fig_bar.update_layout(height=400)
+            st.plotly_chart(fig_bar, use_container_width=True)
+    
         with col7:
-            st.subheader("🫀 Visualisation médicale – Cardiogramme")
+            st.subheader("🫀 Simulation du rythme cardiaque")
             cardiogramme = np.sin(np.linspace(0, 20, 200)) * np.exp(-0.05 * np.linspace(0, 20, 200))
             fig_cardio, ax = plt.subplots()
-            ax.plot(cardiogramme, color="red")
-            ax.set_title("Simulation d'un signal cardiaque")
+            ax.plot(cardiogramme, color="red", linewidth=2)
+            ax.set_title("Signal cardiaque simulé", color='gray')
             ax.set_xticks([])
             ax.set_yticks([])
+            fig_cardio.set_facecolor("#f9f9f9")
             st.pyplot(fig_cardio)
-        
-            st.markdown("---")
-            st.markdown("<p style='text-align:center; color:#808080;'>© 2025 Plateforme d'analyse des dons de sang</p>", unsafe_allow_html=True)
+    
+        st.markdown("---")
+        st.markdown("<p style='text-align:center; color:#808080;'>© 2025 Plateforme d'analyse des dons de sang</p>", unsafe_allow_html=True)
 
 # Tu peux ensuite continuer à ajouter les autres blocs : Aperçu des données, Distribution, etc.
 
