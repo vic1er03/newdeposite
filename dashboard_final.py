@@ -5,6 +5,7 @@ pour répondre aux objectifs du concours de data visualisation.
 
 import streamlit as st
 from streamlit_extras.metric_cards import style_metric_cards
+import re
 
 import pandas as pd
 import pygwalker as pyg
@@ -532,6 +533,82 @@ def create_donor_clustering(df):
 
 # Fonction pour créer un graphique d'analyse de campagne
 @st.cache_data
+def analyse_campagne_2020(df_2020):
+    st.subheader("📅 Analyse des campagnes de la feuille 2020")
+
+    # Nettoyage de la colonne Horodateur
+    df = df_2020.copy()
+    df["Horodateur_clean"] = df["Horodateur"].str.extract(r"^([\d\-/:.\s]+)")
+    df["Horodateur_clean"] = pd.to_datetime(df["Horodateur_clean"], errors="coerce")
+    df["date_only"] = df["Horodateur_clean"].dt.date
+    df["time_only"] = df["Horodateur_clean"].dt.time
+    df['date_only'] = pd.to_datetime(df['date_only'], errors='coerce')
+    df = df.dropna(subset=['date_only'])
+
+    # Ajout des variables temporelles
+    df["Année"] = df["date_only"].dt.year
+    df["Mois"] = df["date_only"].dt.month
+    df["Jour"] = df["date_only"].dt.day
+    df["Jour de la semaine"] = df["date_only"].dt.dayofweek
+    df["Mois_Nom"] = df["Mois"].apply(lambda m: calendar.month_name[m])
+    
+    # --- GRAPHIQUE 1 : Carte thermique ---
+    heatmap_data = df.pivot_table(index="Jour de la semaine", columns="Mois", values="date_only", aggfunc="count")
+    heatmap_data.index = [calendar.day_name[i] for i in heatmap_data.index]
+    heatmap_data.columns = [calendar.month_name[int(col)] for col in heatmap_data.columns]
+
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    sns.heatmap(heatmap_data, cmap="coolwarm", annot=True, fmt=".0f", linewidths=0.5, linecolor="black", ax=ax1)
+    ax1.set_title("Carte thermique : jour × mois", fontsize=12)
+    ax1.set_xlabel("Mois")
+    ax1.set_ylabel("Jour de la semaine")
+    ax1.tick_params(axis='x', rotation=20)
+
+    # --- GRAPHIQUE 2 : Dons par mois ---
+    monthly_counts = df.groupby("Mois_Nom")["date_only"].count()
+    month_order = [calendar.month_name[i] for i in range(1, 13) if calendar.month_name[i] in monthly_counts.index]
+    monthly_counts = monthly_counts.reindex(month_order)
+
+    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    monthly_counts.plot(kind='bar', color='skyblue', ax=ax2)
+    ax2.set_title("Dons par mois", fontsize=12)
+    ax2.set_xlabel("Mois")
+    ax2.set_ylabel("Nombre de dons")
+    ax2.tick_params(axis='x', rotation=45)
+
+    # --- GRAPHIQUE 3 : Dons par jour de la semaine ---
+    weekday_counts = df.groupby("Jour de la semaine")["date_only"].count()
+    weekday_counts.index = [calendar.day_name[i] for i in weekday_counts.index]
+
+    fig3, ax3 = plt.subplots(figsize=(6, 4))
+    weekday_counts.plot(kind='bar', color='lightgreen', ax=ax3)
+    ax3.set_title("Dons par jour de la semaine", fontsize=12)
+    ax3.set_xlabel("Jour")
+    ax3.set_ylabel("Nombre de dons")
+    ax3.tick_params(axis='x', rotation=45)
+
+    # --- GRAPHIQUE 4 : Évolution journalière des dons ---
+    daily_counts = df.groupby("date_only")["Horodateur"].count()
+
+    fig4, ax4 = plt.subplots(figsize=(6, 4))
+    daily_counts.plot(ax=ax4, color='coral')
+    ax4.set_title("Évolution journalière des dons", fontsize=12)
+    ax4.set_xlabel("Date")
+    ax4.set_ylabel("Nombre de dons")
+
+    # --- Affichage en 2 lignes × 2 colonnes ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.pyplot(fig1)
+    with col2:
+        st.pyplot(fig2)
+
+    col3, col4 = st.columns(2)
+    with col3:
+        st.pyplot(fig3)
+    with col4:
+        st.pyplot(fig4)
+
 def create_campaign_analysis(df):
     """
     Crée des visualisations matplotlib (heatmap, barplots, line) pour analyser les dons de sang sur l'année 2019.
@@ -1916,9 +1993,9 @@ def main():
             if dataset=="2019":
                 create_campaign_analysis(df_2019)
             elif dataset=="2020":
-                create_campaign_analysis(df_2020)
+                analyse_campagne_2020(df_2020)
             else:
-                create_campaign_analysis(df_volontaire)
+                st.write("Il n'y a pas d'information concernant cette feuille")
             
             # Ajouter des recommandations pour l'optimisation des campagnes
             st.subheader("Recommandations pour l'optimisation des campagnes")
